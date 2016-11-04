@@ -18,7 +18,7 @@ namespace ins1409298table1 {
 
 
    // Plot: p9066_d1x1y8
-   TGraphAsymmErrors graph_9066_d1x1y1(bool stat = false) {
+   TGraphAsymmErrors* graph_9066_d1x1y1(bool stat = false) {
       double p9066_d1x1y1_xval[] = { 8.25, 8.75, 9.25, 9.75, 10.25, 10.75, 11.25, 11.75, 12.5, 
          13.5, 14.5, 15.5, 16.5, 17.5, 19.0, 21.0, 23.0, 25.0, 28.0, 
          35.0, 50.0, 80.0 };
@@ -44,15 +44,15 @@ namespace ins1409298table1 {
          0.0014, 0.0011, 9.0E-4, 7.3E-4, 6.2E-4, 3.4E-4, 2.5E-4, 1.9E-4, 1.47E-4, 7.8E-5, 
          2.5E-5, 6.6E-6, 1.216E-6 };
       int p9066_d1x1y1_numpoints = 22;
-      TGraphAsymmErrors p9066_d1x1y1 = TGraphAsymmErrors(p9066_d1x1y1_numpoints, p9066_d1x1y1_xval, p9066_d1x1y1_yval, p9066_d1x1y1_xerrminus, p9066_d1x1y1_xerrplus, p9066_d1x1y1_yerrminus, p9066_d1x1y1_yerrplus);
-      if (stat) p9066_d1x1y1 = TGraphAsymmErrors(p9066_d1x1y1_numpoints, p9066_d1x1y1_xval, p9066_d1x1y1_yval, p9066_d1x1y1_xerrminus, p9066_d1x1y1_xerrplus, p9066_d1x1y1_ystatminus, p9066_d1x1y1_ystatplus);
-      p9066_d1x1y1.SetName("/HepData/9066/d1x1y1");
-      p9066_d1x1y1.SetTitle("/HepData/9066/d1x1y1");
+      TGraphAsymmErrors* p9066_d1x1y1 = new TGraphAsymmErrors(p9066_d1x1y1_numpoints, p9066_d1x1y1_xval, p9066_d1x1y1_yval, p9066_d1x1y1_xerrminus, p9066_d1x1y1_xerrplus, p9066_d1x1y1_yerrminus, p9066_d1x1y1_yerrplus);
+      if (stat) p9066_d1x1y1 = new TGraphAsymmErrors(p9066_d1x1y1_numpoints, p9066_d1x1y1_xval, p9066_d1x1y1_yval, p9066_d1x1y1_xerrminus, p9066_d1x1y1_xerrplus, p9066_d1x1y1_ystatminus, p9066_d1x1y1_ystatplus);
+      p9066_d1x1y1->SetName("/HepData/9066/d1x1y1");
+      p9066_d1x1y1->SetTitle("/HepData/9066/d1x1y1");
       // p9066_d1x1y1.Draw("AP");
       return p9066_d1x1y1;
    };
 
-   TGraphAsymmErrors graph_9066_d1x1y2(bool stat = false) {
+   TGraphAsymmErrors* graph_9066_d1x1y2(bool stat = false) {
       double p9066_d1x1y2_xval[] = { 8.25, 8.75, 9.25, 9.75, 10.25, 10.75, 11.25, 11.75, 12.5, 
          13.5, 14.5, 15.5, 16.5, 17.5, 19.0, 21.0, 23.0, 25.0, 28.0, 
          35.0, 50.0, 80.0 };
@@ -78,15 +78,15 @@ namespace ins1409298table1 {
          0.0014, 0.0011, 9.0E-4, 7.2E-4, 6.1E-4, 3.4E-4, 2.4E-4, 1.9E-4, 1.37E-4, 7.7E-5, 
          2.4E-5, 6.5E-6, 1.066E-6 };
       int p9066_d1x1y2_numpoints = 22;
-      TGraphAsymmErrors p9066_d1x1y2 = TGraphAsymmErrors(p9066_d1x1y2_numpoints, p9066_d1x1y2_xval, p9066_d1x1y2_yval, p9066_d1x1y2_xerrminus, p9066_d1x1y2_xerrplus, p9066_d1x1y2_yerrminus, p9066_d1x1y2_yerrplus);
-      if (stat) p9066_d1x1y2 = TGraphAsymmErrors(p9066_d1x1y2_numpoints, p9066_d1x1y2_xval, p9066_d1x1y2_yval, p9066_d1x1y2_xerrminus, p9066_d1x1y2_xerrplus, p9066_d1x1y2_ystatminus, p9066_d1x1y2_ystatplus);
-      p9066_d1x1y2.SetName("/HepData/9066/d1x1y2");
-      p9066_d1x1y2.SetTitle("/HepData/9066/d1x1y2");
+      TGraphAsymmErrors* p9066_d1x1y2 = new TGraphAsymmErrors(p9066_d1x1y2_numpoints, p9066_d1x1y2_xval, p9066_d1x1y2_yval, p9066_d1x1y2_xerrminus, p9066_d1x1y2_xerrplus, p9066_d1x1y2_yerrminus, p9066_d1x1y2_yerrplus);
+      if (stat) p9066_d1x1y2 = new TGraphAsymmErrors(p9066_d1x1y2_numpoints, p9066_d1x1y2_xval, p9066_d1x1y2_yval, p9066_d1x1y2_xerrminus, p9066_d1x1y2_xerrplus, p9066_d1x1y2_ystatminus, p9066_d1x1y2_ystatplus);
+      p9066_d1x1y2->SetName("/HepData/9066/d1x1y2");
+      p9066_d1x1y2->SetTitle("/HepData/9066/d1x1y2");
       // p9066_d1x1y2.Draw("AP");
       return p9066_d1x1y2;
    };
 
-   TGraphAsymmErrors graph_9066_d1x1y3(bool stat = false) {
+   TGraphAsymmErrors* graph_9066_d1x1y3(bool stat = false) {
       double p9066_d1x1y3_xval[] = { 8.25, 8.75, 9.25, 9.75, 10.25, 10.75, 11.25, 11.75, 12.5, 
          13.5, 14.5, 15.5, 16.5, 17.5, 19.0, 21.0, 23.0, 25.0, 28.0, 
          35.0, 50.0, 80.0 };
@@ -112,15 +112,15 @@ namespace ins1409298table1 {
          0.0015, 0.0011, 9.0E-4, 7.6E-4, 6.3E-4, 3.4E-4, 2.5E-4, 1.8E-4, 1.37E-4, 7.8E-5, 
          2.7E-5, 6.1E-6, 1.022E-6 };
       int p9066_d1x1y3_numpoints = 22;
-      TGraphAsymmErrors p9066_d1x1y3 = TGraphAsymmErrors(p9066_d1x1y3_numpoints, p9066_d1x1y3_xval, p9066_d1x1y3_yval, p9066_d1x1y3_xerrminus, p9066_d1x1y3_xerrplus, p9066_d1x1y3_yerrminus, p9066_d1x1y3_yerrplus);
-      if (stat) p9066_d1x1y3 = TGraphAsymmErrors(p9066_d1x1y3_numpoints, p9066_d1x1y3_xval, p9066_d1x1y3_yval, p9066_d1x1y3_xerrminus, p9066_d1x1y3_xerrplus, p9066_d1x1y3_ystatminus, p9066_d1x1y3_ystatplus);
-      p9066_d1x1y3.SetName("/HepData/9066/d1x1y3");
-      p9066_d1x1y3.SetTitle("/HepData/9066/d1x1y3");
+      TGraphAsymmErrors* p9066_d1x1y3 = new TGraphAsymmErrors(p9066_d1x1y3_numpoints, p9066_d1x1y3_xval, p9066_d1x1y3_yval, p9066_d1x1y3_xerrminus, p9066_d1x1y3_xerrplus, p9066_d1x1y3_yerrminus, p9066_d1x1y3_yerrplus);
+      if (stat) p9066_d1x1y3 = new TGraphAsymmErrors(p9066_d1x1y3_numpoints, p9066_d1x1y3_xval, p9066_d1x1y3_yval, p9066_d1x1y3_xerrminus, p9066_d1x1y3_xerrplus, p9066_d1x1y3_ystatminus, p9066_d1x1y3_ystatplus);
+      p9066_d1x1y3->SetName("/HepData/9066/d1x1y3");
+      p9066_d1x1y3->SetTitle("/HepData/9066/d1x1y3");
       // p9066_d1x1y3.Draw("AP");
       return p9066_d1x1y3;
    };
 
-   TGraphAsymmErrors graph_9066_d1x1y4(bool stat = false) {
+   TGraphAsymmErrors* graph_9066_d1x1y4(bool stat = false) {
       double p9066_d1x1y4_xval[] = { 8.25, 8.75, 9.25, 9.75, 10.25, 10.75, 11.25, 11.75, 12.5, 
          13.5, 14.5, 15.5, 16.5, 17.5, 19.0, 21.0, 23.0, 25.0, 28.0, 
          35.0, 50.0, 80.0 };
@@ -146,15 +146,15 @@ namespace ins1409298table1 {
          0.0014, 0.0013, 9.0E-4, 7.6E-4, 6.3E-4, 3.5E-4, 2.6E-4, 2.0E-4, 1.5E-4, 6.9E-5, 
          2.4E-5, 7.9E-6, 1.15E-6 };
       int p9066_d1x1y4_numpoints = 22;
-      TGraphAsymmErrors p9066_d1x1y4 = TGraphAsymmErrors(p9066_d1x1y4_numpoints, p9066_d1x1y4_xval, p9066_d1x1y4_yval, p9066_d1x1y4_xerrminus, p9066_d1x1y4_xerrplus, p9066_d1x1y4_yerrminus, p9066_d1x1y4_yerrplus);
-      if (stat) p9066_d1x1y4 = TGraphAsymmErrors(p9066_d1x1y4_numpoints, p9066_d1x1y4_xval, p9066_d1x1y4_yval, p9066_d1x1y4_xerrminus, p9066_d1x1y4_xerrplus, p9066_d1x1y4_ystatminus, p9066_d1x1y4_ystatplus);
-      p9066_d1x1y4.SetName("/HepData/9066/d1x1y4");
-      p9066_d1x1y4.SetTitle("/HepData/9066/d1x1y4");
+      TGraphAsymmErrors* p9066_d1x1y4 = new TGraphAsymmErrors(p9066_d1x1y4_numpoints, p9066_d1x1y4_xval, p9066_d1x1y4_yval, p9066_d1x1y4_xerrminus, p9066_d1x1y4_xerrplus, p9066_d1x1y4_yerrminus, p9066_d1x1y4_yerrplus);
+      if (stat) p9066_d1x1y4 = new TGraphAsymmErrors(p9066_d1x1y4_numpoints, p9066_d1x1y4_xval, p9066_d1x1y4_yval, p9066_d1x1y4_xerrminus, p9066_d1x1y4_xerrplus, p9066_d1x1y4_ystatminus, p9066_d1x1y4_ystatplus);
+      p9066_d1x1y4->SetName("/HepData/9066/d1x1y4");
+      p9066_d1x1y4->SetTitle("/HepData/9066/d1x1y4");
       // p9066_d1x1y4.Draw("AP");
       return p9066_d1x1y4;
    };
 
-   TGraphAsymmErrors graph_9066_d1x1y5(bool stat = false) {
+   TGraphAsymmErrors* graph_9066_d1x1y5(bool stat = false) {
       double p9066_d1x1y5_xval[] = { 8.25, 8.75, 9.25, 9.75, 10.25, 10.75, 11.25, 11.75, 12.5, 
          13.5, 14.5, 15.5, 16.5, 17.5, 19.0, 21.0, 23.0, 25.0, 28.0, 
          35.0, 50.0, 80.0 };
@@ -180,15 +180,15 @@ namespace ins1409298table1 {
          0.0018, 0.0014, 9.0E-4, 8.6E-4, 7.0E-4, 3.7E-4, 2.7E-4, 2.0E-4, 1.57E-4, 8.4E-5, 
          2.7E-5, 1.52E-5, 1.185E-6 };
       int p9066_d1x1y5_numpoints = 22;
-      TGraphAsymmErrors p9066_d1x1y5 = TGraphAsymmErrors(p9066_d1x1y5_numpoints, p9066_d1x1y5_xval, p9066_d1x1y5_yval, p9066_d1x1y5_xerrminus, p9066_d1x1y5_xerrplus, p9066_d1x1y5_yerrminus, p9066_d1x1y5_yerrplus);
-      if (stat) p9066_d1x1y5 = TGraphAsymmErrors(p9066_d1x1y5_numpoints, p9066_d1x1y5_xval, p9066_d1x1y5_yval, p9066_d1x1y5_xerrminus, p9066_d1x1y5_xerrplus, p9066_d1x1y5_ystatminus, p9066_d1x1y5_ystatplus);
-      p9066_d1x1y5.SetName("/HepData/9066/d1x1y5");
-      p9066_d1x1y5.SetTitle("/HepData/9066/d1x1y5");
+      TGraphAsymmErrors* p9066_d1x1y5 = new TGraphAsymmErrors(p9066_d1x1y5_numpoints, p9066_d1x1y5_xval, p9066_d1x1y5_yval, p9066_d1x1y5_xerrminus, p9066_d1x1y5_xerrplus, p9066_d1x1y5_yerrminus, p9066_d1x1y5_yerrplus);
+      if (stat) p9066_d1x1y5 = new TGraphAsymmErrors(p9066_d1x1y5_numpoints, p9066_d1x1y5_xval, p9066_d1x1y5_yval, p9066_d1x1y5_xerrminus, p9066_d1x1y5_xerrplus, p9066_d1x1y5_ystatminus, p9066_d1x1y5_ystatplus);
+      p9066_d1x1y5->SetName("/HepData/9066/d1x1y5");
+      p9066_d1x1y5->SetTitle("/HepData/9066/d1x1y5");
       // p9066_d1x1y5.Draw("AP");
       return p9066_d1x1y5;
    };
 
-   TGraphAsymmErrors graph_9066_d1x1y6(bool stat = false) {
+   TGraphAsymmErrors* graph_9066_d1x1y6(bool stat = false) {
       double p9066_d1x1y6_xval[] = { 8.25, 8.75, 9.25, 9.75, 10.25, 10.75, 11.25, 11.75, 12.5, 
          13.5, 14.5, 15.5, 16.5, 17.5, 19.0, 21.0, 23.0, 25.0, 28.0, 
          35.0, 50.0, 80.0 };
@@ -214,15 +214,15 @@ namespace ins1409298table1 {
          0.0016, 0.0013, 9.0E-4, 7.1E-4, 6.1E-4, 2.8E-4, 2.4E-4, 1.5E-4, 1.36E-4, 7.0E-5, 
          1.9E-5, 6.0E-6, 8.3E-7 };
       int p9066_d1x1y6_numpoints = 22;
-      TGraphAsymmErrors p9066_d1x1y6 = TGraphAsymmErrors(p9066_d1x1y6_numpoints, p9066_d1x1y6_xval, p9066_d1x1y6_yval, p9066_d1x1y6_xerrminus, p9066_d1x1y6_xerrplus, p9066_d1x1y6_yerrminus, p9066_d1x1y6_yerrplus);
-      if (stat) p9066_d1x1y6 = TGraphAsymmErrors(p9066_d1x1y6_numpoints, p9066_d1x1y6_xval, p9066_d1x1y6_yval, p9066_d1x1y6_xerrminus, p9066_d1x1y6_xerrplus, p9066_d1x1y6_ystatminus, p9066_d1x1y6_ystatplus);
-      p9066_d1x1y6.SetName("/HepData/9066/d1x1y6");
-      p9066_d1x1y6.SetTitle("/HepData/9066/d1x1y6");
+      TGraphAsymmErrors* p9066_d1x1y6 = new TGraphAsymmErrors(p9066_d1x1y6_numpoints, p9066_d1x1y6_xval, p9066_d1x1y6_yval, p9066_d1x1y6_xerrminus, p9066_d1x1y6_xerrplus, p9066_d1x1y6_yerrminus, p9066_d1x1y6_yerrplus);
+      if (stat) p9066_d1x1y6 = new TGraphAsymmErrors(p9066_d1x1y6_numpoints, p9066_d1x1y6_xval, p9066_d1x1y6_yval, p9066_d1x1y6_xerrminus, p9066_d1x1y6_xerrplus, p9066_d1x1y6_ystatminus, p9066_d1x1y6_ystatplus);
+      p9066_d1x1y6->SetName("/HepData/9066/d1x1y6");
+      p9066_d1x1y6->SetTitle("/HepData/9066/d1x1y6");
       // p9066_d1x1y6.Draw("AP");
       return p9066_d1x1y6;
    };
 
-   TGraphAsymmErrors graph_9066_d1x1y7(bool stat = false) {
+   TGraphAsymmErrors* graph_9066_d1x1y7(bool stat = false) {
       double p9066_d1x1y7_xval[] = { 8.25, 8.75, 9.25, 9.75, 10.25, 10.75, 11.25, 11.75, 12.5, 
          13.5, 14.5, 15.5, 16.5, 17.5, 19.0, 21.0, 23.0, 25.0, 28.0, 
          35.0, 50.0, 80.0 };
@@ -248,15 +248,15 @@ namespace ins1409298table1 {
          0.0014, 9.0E-4, 9.0E-4, 6.9E-4, 5.7E-4, 2.5E-4, 1.8E-4, 1.6E-4, 1.21E-4, 6.5E-5, 
          2.21E-5, 6.8E-6, 7.39E-7 };
       int p9066_d1x1y7_numpoints = 22;
-      TGraphAsymmErrors p9066_d1x1y7 = TGraphAsymmErrors(p9066_d1x1y7_numpoints, p9066_d1x1y7_xval, p9066_d1x1y7_yval, p9066_d1x1y7_xerrminus, p9066_d1x1y7_xerrplus, p9066_d1x1y7_yerrminus, p9066_d1x1y7_yerrplus);
-      if (stat) p9066_d1x1y7 = TGraphAsymmErrors(p9066_d1x1y7_numpoints, p9066_d1x1y7_xval, p9066_d1x1y7_yval, p9066_d1x1y7_xerrminus, p9066_d1x1y7_xerrplus, p9066_d1x1y7_ystatminus, p9066_d1x1y7_ystatplus);
-      p9066_d1x1y7.SetName("/HepData/9066/d1x1y7");
-      p9066_d1x1y7.SetTitle("/HepData/9066/d1x1y7");
+      TGraphAsymmErrors* p9066_d1x1y7 = new TGraphAsymmErrors(p9066_d1x1y7_numpoints, p9066_d1x1y7_xval, p9066_d1x1y7_yval, p9066_d1x1y7_xerrminus, p9066_d1x1y7_xerrplus, p9066_d1x1y7_yerrminus, p9066_d1x1y7_yerrplus);
+      if (stat) p9066_d1x1y7 = new TGraphAsymmErrors(p9066_d1x1y7_numpoints, p9066_d1x1y7_xval, p9066_d1x1y7_yval, p9066_d1x1y7_xerrminus, p9066_d1x1y7_xerrplus, p9066_d1x1y7_ystatminus, p9066_d1x1y7_ystatplus);
+      p9066_d1x1y7->SetName("/HepData/9066/d1x1y7");
+      p9066_d1x1y7->SetTitle("/HepData/9066/d1x1y7");
       // p9066_d1x1y7.Draw("AP");
       return p9066_d1x1y7;
    };
 
-   TGraphAsymmErrors graph_9066_d1x1y8(bool stat = false) {
+   TGraphAsymmErrors* graph_9066_d1x1y8(bool stat = false) {
       double p9066_d1x1y8_xval[] = { 8.25, 8.75, 9.25, 9.75, 10.25, 10.75, 11.25, 11.75, 12.5, 
          13.5, 14.5, 15.5, 16.5, 17.5, 19.0, 21.0, 23.0, 25.0, 28.0, 
          35.0, 50.0, 80.0 };
@@ -282,10 +282,10 @@ namespace ins1409298table1 {
          0.0016, 0.001, 9.0E-4, 6.1E-4, 5.0E-4, 3.4E-4, 2.4E-4, 1.4E-4, 1.31E-4, 2.05E-4, 
          7.24E-5, 1.02E-5, 2.147E-6 };
       int p9066_d1x1y8_numpoints = 22;
-      TGraphAsymmErrors p9066_d1x1y8 = TGraphAsymmErrors(p9066_d1x1y8_numpoints, p9066_d1x1y8_xval, p9066_d1x1y8_yval, p9066_d1x1y8_xerrminus, p9066_d1x1y8_xerrplus, p9066_d1x1y8_yerrminus, p9066_d1x1y8_yerrplus);
-      if (stat) p9066_d1x1y8 = TGraphAsymmErrors(p9066_d1x1y8_numpoints, p9066_d1x1y8_xval, p9066_d1x1y8_yval, p9066_d1x1y8_xerrminus, p9066_d1x1y8_xerrplus, p9066_d1x1y8_ystatminus, p9066_d1x1y8_ystatplus);
-      p9066_d1x1y8.SetName("/HepData/9066/d1x1y8");
-      p9066_d1x1y8.SetTitle("/HepData/9066/d1x1y8");
+      TGraphAsymmErrors* p9066_d1x1y8 = new TGraphAsymmErrors(p9066_d1x1y8_numpoints, p9066_d1x1y8_xval, p9066_d1x1y8_yval, p9066_d1x1y8_xerrminus, p9066_d1x1y8_xerrplus, p9066_d1x1y8_yerrminus, p9066_d1x1y8_yerrplus);
+      if (stat) p9066_d1x1y8 = new TGraphAsymmErrors(p9066_d1x1y8_numpoints, p9066_d1x1y8_xval, p9066_d1x1y8_yval, p9066_d1x1y8_xerrminus, p9066_d1x1y8_xerrplus, p9066_d1x1y8_ystatminus, p9066_d1x1y8_ystatplus);
+      p9066_d1x1y8->SetName("/HepData/9066/d1x1y8");
+      p9066_d1x1y8->SetTitle("/HepData/9066/d1x1y8");
       // p9066_d1x1y8.Draw("AP");
       return p9066_d1x1y8;
    };

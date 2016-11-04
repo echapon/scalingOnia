@@ -4,10 +4,14 @@
 #include "TGraphAsymmErrors.h"
 #include <math.h>
 
-typedef struct range {
-   double min;
-   double max;
-} range;
+class range {
+   public:
+      double min;
+      double max;
+
+      range(): min(0), max(0) {};
+      range(double mmin, double mmax): min(mmin), max(mmax) {};
+};
 
 typedef enum Escaling {
    pt2,
@@ -136,7 +140,7 @@ TGraphAsymmErrors *ngraph(TGraphAsymmErrors* g1, TGraphAsymmErrors *g2, double s
 
    TGraphAsymmErrors *ans = new TGraphAsymmErrors(g1->GetN());
    ans->SetName(TString(g1->GetName()) + "_" + TString(g2->GetName()) + "_n");
-   ans->SetTitle(TString("n exponent of ") + TString(g1->GetTitle()) + " vs " + TString(g2->GetTitle()));
+   ans->SetTitle(TString("n exponent of (") + TString(g1->GetTitle()) + ") vs (" + TString(g2->GetTitle()) + ")");
 
    TGraph *g1low = graphlow(g1);
    TGraph *g1high = graphhigh(g1);
@@ -188,6 +192,67 @@ TGraphAsymmErrors *ngraph(TGraphAsymmErrors* g1, TGraphAsymmErrors *g2, double s
    if (lng2low) {delete lng2low; lng2low=0;}
    if (lng1high) {delete lng1high; lng1high=0;}
    if (lng2high) {delete lng2high; lng2high=0;}
+
+   return ans;
+};
+
+TGraphAsymmErrors *ratiograph(TGraphAsymmErrors* gnum, TGraphAsymmErrors *gden, Einterpolation type=loglin, bool correl=false) {
+   // take the ratio of two graphs
+
+   TGraphAsymmErrors *ans = new TGraphAsymmErrors(gnum->GetN());
+   ans->SetName(TString(gnum->GetName()) + "_" + TString(gden->GetName()) + "_ratio");
+   ans->SetTitle(TString("ratio of (") + TString(gnum->GetTitle()) + ") / (" + TString(gden->GetTitle()) + ")");
+
+   TGraph *gnumlow = graphlow(gnum);
+   TGraph *gnumhigh = graphhigh(gnum);
+   TGraph *gdenlow = correl ? graphlow(gden) : graphhigh(gden);
+   TGraph *gdenhigh = correl ? graphhigh(gden) : graphlow(gden);
+
+   TGraphAsymmErrors *lngnum=NULL, *lngden=NULL;
+   TGraph *lngnumlow=NULL, *lngnumhigh=NULL, *lngdenlow=NULL, *lngdenhigh=NULL;
+   if (type==loglin || type==logcspline) {
+      lngnum = lngraph(gnum);
+      lngden = lngraph(gden);
+      lngnumlow = lngraph(gnumlow);
+      lngdenlow = lngraph(gdenlow);
+      lngnumhigh = lngraph(gnumhigh);
+      lngdenhigh = lngraph(gdenhigh);
+   }
+
+   for (int i=0; i<gnum->GetN(); i++) {
+      double x = gnum->GetX()[i];
+      double exl = gnum->GetEXlow()[i];
+      double exh = gnum->GetEXhigh()[i];
+      double y=0,eyl=0,eyh=0,ya=0,yb=0;
+      if (type==lin) {
+         y = gnum->Eval(x)/gden->Eval(x);
+         ya = gnumhigh->Eval(x)/gdenlow->Eval(x);
+         yb = gnumlow->Eval(x)/gdenhigh->Eval(x);
+      } else if (type==cspline) {
+         y = gnum->Eval(x,0,"S")/gden->Eval(x,0,"S");
+         ya = gnumhigh->Eval(x,0,"S")/gdenlow->Eval(x,0,"S");
+         yb = gnumlow->Eval(x,0,"S")/gdenhigh->Eval(x,0,"S");
+      } else if (type==loglin) {
+         y = exp(lngnum->Eval(log(x)))/exp(lngden->Eval(log(x),0,"S"));
+         ya = exp(lngnumhigh->Eval(log(x)))/exp(lngdenlow->Eval(log(x),0,"S"));
+         yb = exp(lngnumlow->Eval(log(x)))/exp(lngdenhigh->Eval(log(x),0,"S"));
+      } else if (type==logcspline) {
+         y = exp(lngnum->Eval(log(x),0,"S"))/exp(lngden->Eval(log(x),0,"S"));
+         ya = exp(lngnumhigh->Eval(log(x),0,"S"))/exp(lngdenlow->Eval(log(x),0,"S"));
+         yb = exp(lngnumlow->Eval(log(x),0,"S"))/exp(lngdenhigh->Eval(log(x),0,"S"));
+      }
+      eyl = y - min(ya,yb);
+      eyh = max(ya,yb) - y;
+      ans->SetPoint(i,x,y);
+      ans->SetPointError(i,exl,exh,eyl,eyh);
+   }
+
+   if (lngnum) {delete lngnum; lngnum=0;}
+   if (lngden) {delete lngden; lngden=0;}
+   if (lngnumlow) {delete lngnumlow; lngnumlow=0;}
+   if (lngdenlow) {delete lngdenlow; lngdenlow=0;}
+   if (lngnumhigh) {delete lngnumhigh; lngnumhigh=0;}
+   if (lngdenhigh) {delete lngdenhigh; lngdenhigh=0;}
 
    return ans;
 };
