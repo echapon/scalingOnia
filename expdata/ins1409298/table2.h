@@ -13,8 +13,8 @@ namespace ins1409298table2 {
    string qual = "RE : P P --> J/PSI < MU+ MU- > X";
    double sqrts = 8000.0; // GEV
    // string qual = YRAP : 0.0 TO 0.25 : 0.25 TO 0.5 : 0.5 TO 0.75 : 0.75 TO 1.0 : 1.0 TO 1.25 : 1.25 TO 1.5 : 1.5 TO 1.75 : 1.75 TO 2.0
-   string yheader = "D2SIG/DPT/DYRAP*BR [NB/GEV]";
-   string xheader = "PT IN GEV ";
+   string yheader = "d^{2}#sigma/dp_{T}/dy #times BR [nb/GeV]"; // "D2SIG/DPT/DYRAP*BR [NB/GEV]";
+   string xheader = "p_{T} [GeV]"; // "PT IN GEV ";
 
 
    // Plot: p9066_d2x1y8

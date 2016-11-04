@@ -104,7 +104,7 @@ dataset dataset_atlas_8tev(double rapidity) {
    }
 
    ostringstream oss;
-   oss << "ATLAS, 7TeV, " << ans.get_raprange().min << "<|y|<" << ans.get_raprange().max;
+   oss << "ATLAS, " << ans.get_sqrts()/1000. << "TeV, " << ans.get_raprange().min << "<|y|<" << ans.get_raprange().max;
    ans.set_legend(oss.str());
 
    return ans;
