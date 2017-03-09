@@ -183,6 +183,7 @@ TGraphAsymmErrors *ngraph(TGraphAsymmErrors* g1, TGraphAsymmErrors *g2, double s
       eyl = y - min(ya,yb);
       eyh = max(ya,yb) - y;
       ans->SetPoint(i,x,y);
+      // cout << i << " " << x << " " << y << " " << exl << " " << exh << " " << eyl << " " << eyh << endl;
       ans->SetPointError(i,exl,exh,eyl,eyh);
    }
 
@@ -226,18 +227,22 @@ TGraphAsymmErrors *ratiograph(TGraphAsymmErrors* gnum, TGraphAsymmErrors *gden, 
       double y=0,eyl=0,eyh=0,ya=0,yb=0;
       if (type==lin) {
          y = gnum->Eval(x)/gden->Eval(x);
+         // if (y<0) cout << x << ", " << y << " = " <<  gnum->Eval(x) << "/" << gden->Eval(x) << endl;
          ya = gnumhigh->Eval(x)/gdenlow->Eval(x);
          yb = gnumlow->Eval(x)/gdenhigh->Eval(x);
       } else if (type==cspline) {
          y = gnum->Eval(x,0,"S")/gden->Eval(x,0,"S");
+         // if (y<0) cout << x << ", " << y << " = " << gnum->Eval(x,0,"S") << "/" << gden->Eval(x,0,"S") << endl;
          ya = gnumhigh->Eval(x,0,"S")/gdenlow->Eval(x,0,"S");
          yb = gnumlow->Eval(x,0,"S")/gdenhigh->Eval(x,0,"S");
       } else if (type==loglin) {
          y = exp(lngnum->Eval(log(x)))/exp(lngden->Eval(log(x),0,"S"));
+         // if (y<0) cout << x << ", " << y << " = " << exp(lngnum->Eval(log(x))) << "/" << exp(lngden->Eval(log(x),0,"S")) << endl;
          ya = exp(lngnumhigh->Eval(log(x)))/exp(lngdenlow->Eval(log(x),0,"S"));
          yb = exp(lngnumlow->Eval(log(x)))/exp(lngdenhigh->Eval(log(x),0,"S"));
       } else if (type==logcspline) {
          y = exp(lngnum->Eval(log(x),0,"S"))/exp(lngden->Eval(log(x),0,"S"));
+         // if (y<0) cout << x << ", " << y  << " = " << exp(lngnum->Eval(log(x),0,"S")) << "/" << exp(lngden->Eval(log(x),0,"S")) << endl;
          ya = exp(lngnumhigh->Eval(log(x),0,"S"))/exp(lngdenlow->Eval(log(x),0,"S"));
          yb = exp(lngnumlow->Eval(log(x),0,"S"))/exp(lngdenhigh->Eval(log(x),0,"S"));
       }
@@ -296,5 +301,64 @@ TGraphAsymmErrors *xlw(TGraphAsymmErrors *g) {
 
    return ans;
 }
+
+TGraphAsymmErrors *interpolgraph(TGraphAsymmErrors* gr, int n, Einterpolation type=loglin) {
+   // interpolate a graph by making it with more points
+
+   TGraphAsymmErrors *ans = new TGraphAsymmErrors(n);
+   ans->SetName(TString(gr->GetName()) + "_interpol");
+   ans->SetTitle(TString(gr->GetTitle()) + " with interpolation");
+
+   TGraph *grlow = graphlow(gr);
+   TGraph *grhigh = graphhigh(gr);
+
+   TGraphAsymmErrors *lngr=NULL;
+   TGraph *lngrlow=NULL, *lngrhigh=NULL;
+   if (type==loglin || type==logcspline) {
+      lngr = lngraph(gr);
+      lngrlow = lngraph(grlow);
+      lngrhigh = lngraph(grhigh);
+   }
+
+   double xmin = gr->GetX()[0]-gr->GetEXlow()[0];
+   if (xmin<=0) xmin=1e-2;
+   double xmax = gr->GetX()[gr->GetN()-1]+gr->GetEXhigh()[gr->GetN()-1];
+   double dr = (xmax-xmin)/n;
+
+   for (int i=0; i<n; i++) {
+      double x = xmin+dr*i;
+      double exl = 0;
+      double exh = 0;
+      double y=0,eyl=0,eyh=0,ya=0,yb=0;
+      if (type==lin) {
+         y = gr->Eval(x);
+         ya = grhigh->Eval(x);
+         yb = grlow->Eval(x);
+      } else if (type==cspline) {
+         y = gr->Eval(x,0,"S");
+         ya = grhigh->Eval(x,0,"S");
+         yb = grlow->Eval(x,0,"S");
+      } else if (type==loglin) {
+         y = exp(lngr->Eval(log(x)));
+         ya = exp(lngrhigh->Eval(log(x)));
+         yb = exp(lngrlow->Eval(log(x)));
+      } else if (type==logcspline) {
+         y = exp(lngr->Eval(log(x),0,"S"));
+         ya = exp(lngrhigh->Eval(log(x),0,"S"));
+         yb = exp(lngrlow->Eval(log(x),0,"S"));
+      }
+      eyl = y - min(ya,yb);
+      eyh = max(ya,yb) - y;
+      ans->SetPoint(i,x,y);
+      // ans->SetPointError(i,exl,exh,eyl,eyh);
+      ans->SetPointError(i,exl,exh,0,0);
+   }
+
+   if (lngr) {delete lngr; lngr=0;}
+   if (lngrlow) {delete lngrlow; lngrlow=0;}
+   if (lngrhigh) {delete lngrhigh; lngrhigh=0;}
+
+   return ans;
+};
 
 #endif // ifndef range_h

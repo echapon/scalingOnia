@@ -24,7 +24,7 @@ class dataset {
 
    public:
       // constructor
-      dataset() {};
+      dataset() : fstat(0), fsyst(0), ftot(0) {};
 
       // destructor
       ~dataset() {
@@ -61,6 +61,8 @@ class dataset {
       void set_sqrts(double sqrts) {fsqrts = sqrts;};
       void set_raprange(range raprange) {fraprange.min = raprange.min; fraprange.max = raprange.max;};
       void set_graph(TGraphAsymmErrors *gstat, TGraphAsymmErrors *gsyst);
+      void set_graph(TH1F *hist);
+      void set_graph(const char* file_theory);
       void set_name(string name) {fname = name;};
       void set_expname(string expname) {fexpname = expname;};
       void set_legend(string legend) {flegend = legend;};
@@ -69,6 +71,9 @@ class dataset {
       void set_xheader(string xheader) {fxheader = xheader;};
       void set_yheader(string yheader) {fyheader = yheader;};
       void set_reaction(string reaction) {freaction = reaction;};
+
+      // other functions
+      void interpolate(int n, Einterpolation type=loglin, bool doLW=false);
 };
 
 #endif // ifndef dataset_h

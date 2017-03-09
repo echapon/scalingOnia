@@ -17,12 +17,12 @@
 using namespace std;
 
 // global settings
-const Escaling       gscaling = mtpt;
+const Escaling       gscaling = pt2;
 const Einterpolation ginterpolation = loglin;
 float                gTextSize = 0.04;
 // should we use the Lafferty & Wyatt prescription to change the x position of the points? (assuming a locally exponentially falling spectrum)
-bool                 doxLW = true;
-bool                 plotxt = true;
+bool                 doxLW = true;//true;
+bool                 plotxt = true;//true;
 
 // declarations
 int   mycolor(int i);
@@ -88,111 +88,123 @@ void plot(vector<dataset> data, vector<dataset> theory) {
    tleg->SetBorderSize(0);
 
    // loop on datasets...
-   bool isfirst=true;
-   for (unsigned int i=0; i<data.size(); i++) {
+   for (unsigned int i=0; i<data.size()+theory.size(); i++) {
       pad1->cd();
-      TGraphAsymmErrors *gstat = data[i].get_graphstat();
+      int idata = i - theory.size();
+      bool isth = (idata<0);
+      dataset *di = (!isth) ? &(data[idata]) : &(theory[i]);
+      TGraphAsymmErrors *gstat = di->get_graphstat();
       if (gstat) {
-         if (doxLW) gstat = xlw(gstat);
-         if (plotxt) gstat = xtgraph(gstat, data[i].get_sqrts(), gscaling);
+         if (doxLW && !isth) gstat = xlw(gstat);
+         if (plotxt) gstat = xtgraph(gstat, di->get_sqrts(), gscaling);
 
          // gstat->SetMarkerStyle(20+i);
          gstat->SetMarkerStyle(kBlack);
          gstat->SetMarkerColor(mycolor(i));
+         if (isth) gstat->SetMarkerSize(0);
          gstat->SetLineColor(mycolor(i));
          if (i==0) {
             // draw axes
-            TH1F *axes = haxes(gstat,data[i],lTextSize,503,true);
+            TH1F *axes = haxes(gstat,*di,lTextSize,503,true);
             axes->Draw();
          }
-         gstat->Draw("P");
+         if (!isth) gstat->Draw("P");
+         else gstat->Draw("P");
 
-         tleg->AddEntry(gstat,data[i].get_legend().c_str(),"LP");
+         tleg->AddEntry(gstat,di->get_legend().c_str(),isth ? "L" : "LP");
       }
 
-      TGraphAsymmErrors *gtot  = data[i].get_graphtot();
+      TGraphAsymmErrors *gtot  = di->get_graphtot();
       if (gtot) {
-         if (doxLW) gtot = xlw(gtot);
-         if (plotxt) gtot = xtgraph(gtot, data[i].get_sqrts(), gscaling);
+         if (doxLW && !isth) gtot = xlw(gtot);
+         if (plotxt) gtot = xtgraph(gtot, di->get_sqrts(), gscaling);
 
          gtot->SetMarkerStyle(20+i);
          gtot->SetMarkerColor(mycolor(i));
+         if (isth) gtot->SetMarkerSize(0);
          gtot->SetLineColor(mycolor(i));
          if (!gstat && i==0) {
             // draw axes
-            TH1F *axes = haxes(gtot,data[i],lTextSize,503,true);
+            TH1F *axes = haxes(gtot,*di,lTextSize,503,true);
             axes->Draw();
          }
-         gtot->Draw("P");
+         gtot->Draw(isth ? "L" : "P");
 
-         if (!gstat) tleg->AddEntry(gstat,data[i].get_legend().c_str(),"LP");
+         if (!gstat) tleg->AddEntry(gstat,di->get_legend().c_str(),isth ? "L" : "LP");
       }
 
-      if (i>0) {
+      if (idata != 0) {
          // make ratios
          pad2->cd();
-         TGraphAsymmErrors *g0stat = data[0].get_graphstat();
-         TGraphAsymmErrors *g0tot = data[0].get_graphtot();
+         TGraphAsymmErrors *g0stat = isth ? theory[0].get_graphstat() : data[0].get_graphstat();
+         TGraphAsymmErrors *g0tot = isth ? theory[0].get_graphtot() : data[0].get_graphtot();
          TGraphAsymmErrors *gratiostat=NULL, *gratiotot=NULL;
          if (gstat && g0stat) {
-            if (doxLW) g0stat = xlw(g0stat);
+            if (doxLW && !isth) g0stat = xlw(g0stat);
             if (plotxt) g0stat = xtgraph(g0stat, data[0].get_sqrts(), gscaling);
             gratiostat = ratiograph(gstat,g0stat,ginterpolation);
             gratiostat->SetMarkerStyle(20+i);
             gratiostat->SetMarkerColor(mycolor(i));
+            if (isth) gratiostat->SetMarkerSize(0);
             gratiostat->SetLineColor(mycolor(i));
             if (i==1) {
                // draw axes
-               TH1F *axes = haxes(gratiostat,data[i],lTextSize2,505);
+               TH1F *axes = haxes(gratiostat,*di,lTextSize2,505);
                axes->GetYaxis()->SetTitle("ratio");
                axes->Draw();
             }
-            gratiostat->Draw("P");
+            gratiostat->Draw(isth ? "L" : "P");
          }
          if (gtot && g0tot) {
-            if (doxLW) g0tot = xlw(g0tot);
+            if (doxLW && !isth) g0tot = xlw(g0tot);
             if (plotxt) g0tot = xtgraph(g0tot, data[0].get_sqrts(), gscaling);
             gratiotot = ratiograph(gtot,g0tot,ginterpolation);
             gratiotot->SetMarkerStyle(20+i);
             gratiotot->SetMarkerColor(mycolor(i));
+            if (isth) gratiotot->SetMarkerSize(0);
             gratiotot->SetLineColor(mycolor(i));
             if (i==1 && !gratiostat) {
                // draw axes
-               TH1F *axes = haxes(gratiotot,data[i],lTextSize2,505);
+               TH1F *axes = haxes(gratiotot,*di,lTextSize2,505);
                axes->GetYaxis()->SetTitle("ratio");
                axes->Draw();
             }
-            gratiotot->Draw("P");
+            gratiotot->Draw(isth ? "L" : "P");
          }
 
-         if (plotxt) {
+         if (plotxt && i!=0) {
             // graph of n
             pad3->cd();
             TGraphAsymmErrors *gnstat=NULL, *gntot=NULL;
             if (gstat && g0stat) {
-               gnstat = ngraph(gstat,g0stat,data[i].get_sqrts(),data[0].get_sqrts(),ginterpolation);
+               if (!isth) gnstat = ngraph(gstat,g0stat,di->get_sqrts(),data[0].get_sqrts(),ginterpolation);
+               else gnstat = ngraph(gstat,g0stat,di->get_sqrts(),theory[0].get_sqrts(),ginterpolation);
                gnstat->SetMarkerStyle(20+i);
                gnstat->SetMarkerColor(mycolor(i));
+               if (isth) gnstat->SetMarkerSize(0);
                gnstat->SetLineColor(mycolor(i));
                if (i==1) {
                   // draw axes
-                  TH1F *axes = haxes(gnstat,data[i],lTextSize3,505);
+                  TH1F *axes = haxes(gnstat,*di,lTextSize3,505);
                   axes->GetYaxis()->SetTitle("n_{eff}");
                   axes->Draw();
                }
-               gnstat->Draw("P");
+               gnstat->Draw(isth ? "L" : "P");
             }
             if (gtot && g0tot) {
-               gntot = ngraph(gtot,g0tot,data[i].get_sqrts(),data[0].get_sqrts(),ginterpolation);
+               if (!isth) gntot = ngraph(gtot,g0tot,di->get_sqrts(),data[0].get_sqrts(),ginterpolation);
+               else gntot = ngraph(gtot,g0tot,di->get_sqrts(),theory[0].get_sqrts(),ginterpolation);
                gntot->SetMarkerStyle(20+i);
+               if (isth) gntot->SetMarkerSize(0);
                gntot->SetMarkerColor(mycolor(i));
                gntot->SetLineColor(mycolor(i));
                if (i==1 && !gnstat) {
                   // draw axes
-                  TH1F *axes = haxes(gntot,data[i],lTextSize3,505);
+                  TH1F *axes = haxes(gntot,*di,lTextSize3,505);
                   axes->GetYaxis()->SetTitle("n_{eff}");
                   axes->Draw();
                }
+               gntot->Draw(isth ? "L" : "P");
             }
          } // if (plotxt)
       } // if (i>1) 
@@ -250,7 +262,7 @@ TH1F* haxes(TGraphAsymmErrors *graph, dataset data, float textSize, int ndiv, bo
       ymax=1.2*ymax;
    }
 
-   TH1F *ans = new TH1F(Form("haxes_%f_%f%f_%f%f",textSize,xmin,xmax,ymin,ymax),"haxes",1,xmin,xmax);
+   TH1F *ans = new TH1F(Form("haxes_%f_%f%f_%f%f",textSize,xmin,xmax,ymin,ymax),"haxes",1000,xmin,xmax);
    ans->SetMinimum(ymin);
    ans->SetMaximum(ymin);
    ans->GetXaxis()->SetTitle(plotxt ? "x_{T}" : data.get_xheader().c_str());
