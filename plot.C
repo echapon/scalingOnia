@@ -128,7 +128,10 @@ void plot(vector<dataset> data, vector<dataset> theory) {
             TH1F *axes = haxes(gtot,*di,lTextSize,503,true);
             axes->Draw();
          }
-         gtot->Draw(isth ? "L" : "P");
+         gtot->SetFillColor(mycolor(i));
+         gtot->SetFillStyle(0);
+         gtot->Draw(isth ? "a3" : "P");
+         if (isth) gstat->Draw("P");
 
          if (!gstat) tleg->AddEntry(gstat,di->get_legend().c_str(),isth ? "L" : "LP");
       }
@@ -169,7 +172,10 @@ void plot(vector<dataset> data, vector<dataset> theory) {
                axes->GetYaxis()->SetTitle("ratio");
                axes->Draw();
             }
-            gratiotot->Draw(isth ? "L" : "P");
+            gratiotot->SetFillColor(mycolor(i));
+            gratiotot->SetFillStyle(0);
+            gratiotot->Draw(isth ? "a3" : "P");
+            if (isth) gratiostat->Draw("P");
          }
 
          if (plotxt && i!=0) {
@@ -208,11 +214,7 @@ void plot(vector<dataset> data, vector<dataset> theory) {
             }
          } // if (plotxt)
       } // if (i>1) 
-
-      // take care of theory here
-      // [not implemented yet] //FIXME
-
-   } // for (int i=0; i<data.size(); i++) 
+   } // for (unsigned int i=0; i<data.size()+theory.size(); i++) 
 
    pad1->cd();
    tleg->Draw();

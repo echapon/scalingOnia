@@ -225,12 +225,12 @@ TGraphAsymmErrors *ratiograph(TGraphAsymmErrors* gnum, TGraphAsymmErrors *gden, 
       double exl = gnum->GetEXlow()[i];
       double exh = gnum->GetEXhigh()[i];
       double y=0,eyl=0,eyh=0,ya=0,yb=0;
-      if (type==lin) {
+      if (type==lin || (type==loglin && x<=0)) {
          y = gnum->Eval(x)/gden->Eval(x);
          // if (y<0) cout << x << ", " << y << " = " <<  gnum->Eval(x) << "/" << gden->Eval(x) << endl;
          ya = gnumhigh->Eval(x)/gdenlow->Eval(x);
          yb = gnumlow->Eval(x)/gdenhigh->Eval(x);
-      } else if (type==cspline) {
+      } else if (type==cspline || (type==logcspline && x<=0)) {
          y = gnum->Eval(x,0,"S")/gden->Eval(x,0,"S");
          // if (y<0) cout << x << ", " << y << " = " << gnum->Eval(x,0,"S") << "/" << gden->Eval(x,0,"S") << endl;
          ya = gnumhigh->Eval(x,0,"S")/gdenlow->Eval(x,0,"S");
@@ -286,7 +286,7 @@ TGraphAsymmErrors *xlw(TGraphAsymmErrors *g) {
          double b;
          if (i>0) b = -log(tmp->GetY()[i]/tmp->GetY()[i-1])/(tmp->GetX()[i]-tmp->GetX()[i-1]);
          else b = -log(tmp->GetY()[i+1]/tmp->GetY()[i])/(tmp->GetX()[i+1]-tmp->GetX()[i]);
-         double xlw = (x-exl) + (1./b) * (log(b*(exl+exh)) - log(1-exp(-b*(exl+exh))));
+         double xlw = (b>0 && exl+exh>0) ? (x-exl) + (1./b) * (log(b*(exl+exh)) - log(1-exp(-b*(exl+exh)))) : x;
          double exl_lw = exl - x + xlw;
          double exh_lw = exh + x - xlw;
 

@@ -67,8 +67,8 @@ TGraphAsymmErrors* read_hwu(const char* fname, int ihist, int icol) {
 
    const int n = x.size();
 
-   for (int i=0; i<n; i++)
-      cout << x[i] << " " << y[i] << " " << dy[i] << endl;
+   // for (int i=0; i<n; i++)
+      // cout << x[i] << " " << y[i] << " " << dy[i] << endl;
 
    TGraphAsymmErrors *ans = new TGraphAsymmErrors(n,x.data(),y.data(),dx.data(),dx.data(),dy.data(),dy.data());
    ans->SetName(Form("gHwU_%i%i",ihist,icol));

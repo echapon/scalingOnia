@@ -3,8 +3,14 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include "TGraphAsymmErrors.h"
 #include "utils.h"
+#include "hwu_reader.h"
+
+const bool takeMaxSyst = true;
+
+using namespace std;
 
 class dataset {
    private:
@@ -12,6 +18,7 @@ class dataset {
       range          fraprange;
       TGraphAsymmErrors *fstat;
       TGraphAsymmErrors *fsyst;
+      vector<TGraphAsymmErrors*> fsyst_all;
       TGraphAsymmErrors *ftot;
       string         fname;
       string         fexpname;
@@ -24,7 +31,7 @@ class dataset {
 
    public:
       // constructor
-      dataset() : fstat(0), fsyst(0), ftot(0) {};
+      dataset() : fstat(0), fsyst(0), fsyst_all(), ftot(0) {};
 
       // destructor
       ~dataset() {
@@ -46,8 +53,12 @@ class dataset {
       double             get_sqrts() const {return fsqrts;};
       range              get_raprange() const {return fraprange;};
       TGraphAsymmErrors* get_graphstat() const {return fstat;};
-      TGraphAsymmErrors* get_graphsyst() const {return fsyst;};
-      TGraphAsymmErrors* get_graphtot() const {return ftot;};
+      TGraphAsymmErrors* get_graphsyst();
+      vector<TGraphAsymmErrors*> get_graphssyst() const {return fsyst_all;};
+      TGraphAsymmErrors* get_graphtot() {
+         if (!fsyst && fsyst_all.size()>0) get_graphsyst();
+         return ftot;
+      };
       string             get_name() const {return fname;};
       string             get_expname() const {return fexpname;};
       string             get_legend() const {return flegend;};
@@ -60,9 +71,11 @@ class dataset {
       // setters
       void set_sqrts(double sqrts) {fsqrts = sqrts;};
       void set_raprange(range raprange) {fraprange.min = raprange.min; fraprange.max = raprange.max;};
+      void set_graph(TGraphAsymmErrors *gstat, vector<TGraphAsymmErrors*> gsyst);
       void set_graph(TGraphAsymmErrors *gstat, TGraphAsymmErrors *gsyst);
       void set_graph(TH1F *hist);
       void set_graph(const char* file_theory);
+      void set_graphHwU(const char* file_theory, int nsysts=0);
       void set_name(string name) {fname = name;};
       void set_expname(string expname) {fexpname = expname;};
       void set_legend(string legend) {flegend = legend;};
