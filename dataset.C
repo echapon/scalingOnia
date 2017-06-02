@@ -83,33 +83,7 @@ TGraphAsymmErrors* dataset::get_graphsyst() {
    if (fsyst_all.size()==0) return NULL;
 
    // we don't have a fsyst yet: compute it from the vector of systs
-   fsyst = (TGraphAsymmErrors*) fsyst_all[0]->Clone(TString(fsyst_all[0]->GetName())+"_all");
-   int n = fsyst->GetN();
-   if (takeMaxSyst) { // min max
-      double *thevalsmin = new double[n];
-      double *thevalsmax = new double[n];
-      for (int i=0; i<n; i++) {thevalsmin[i]=fstat->GetY()[i]; thevalsmax[i]=fstat->GetY()[i];}
-
-      for (unsigned int i=0; i<fsyst_all.size(); i++) 
-         for (int j=0; j<n; j++) {
-            thevalsmin[j] = min(fsyst_all[i]->GetY()[j],thevalsmin[j]);
-            thevalsmax[j] = max(fsyst_all[i]->GetY()[j],thevalsmax[j]);
-         }
-      for (int i=0; i<n; i++) fsyst->SetPoint(i,fsyst->GetX()[i],fstat->GetY()[i]);
-      for (int i=0; i<n; i++) fsyst->SetPointError(i,
-            fsyst->GetEXlow()[i],fsyst->GetEXhigh()[i],
-            fstat->GetY()[i]-thevalsmin[i],thevalsmax[i]-fstat->GetY()[i]);
-   } else { // quadratic sum
-      double *thevals = new double[n];
-      for (int i=0; i<n; i++) thevals[i]=0;
-
-      for (unsigned int i=0; i<fsyst_all.size(); i++) 
-         for (int j=0; j<n; j++) {
-            thevals[j] += pow(fsyst_all[i]->GetY()[j]-fstat->GetY()[j],2);
-         }
-      for (int i=0; i<n; i++) fsyst->SetPoint(i,fsyst->GetX()[i],fstat->GetY()[i]);
-      for (int i=0; i<n; i++) fsyst->SetPointError(i,fsyst->GetEXlow()[i],fsyst->GetEXhigh()[i],sqrt(thevals[i]),sqrt(thevals[i]));
-   }
+   fsyst = combo(fstat,fsyst_all,takeMaxSyst);
 
    // compute the graph for stat+syst
    if (fstat && fsyst) ftot = combgraph(fstat,fsyst);

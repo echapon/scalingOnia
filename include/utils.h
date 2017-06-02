@@ -361,4 +361,54 @@ TGraphAsymmErrors *interpolgraph(TGraphAsymmErrors* gr, int n, Einterpolation ty
    return ans;
 };
 
+TGraphAsymmErrors *combo(TGraphAsymmErrors* g0, vector<TGraphAsymmErrors*> gall, bool dominmax=true) {
+   if (gall.size()==0) return NULL;
+   TGraphAsymmErrors *ans = (TGraphAsymmErrors*) gall[0]->Clone(TString(gall[0]->GetName())+"_all");
+   int n = ans->GetN();
+   if (dominmax) { // min max
+      double *thevalsmin = new double[n];
+      double *thevalsmax = new double[n];
+      for (int i=0; i<n; i++) {thevalsmin[i]=g0->GetY()[i]; thevalsmax[i]=g0->GetY()[i];}
+
+      for (unsigned int i=0; i<gall.size(); i++) 
+         for (int j=0; j<n; j++) {
+            thevalsmin[j] = min(gall[i]->GetY()[j],thevalsmin[j]);
+            thevalsmax[j] = max(gall[i]->GetY()[j],thevalsmax[j]);
+         }
+      for (int i=0; i<n; i++) ans->SetPoint(i,ans->GetX()[i],g0->GetY()[i]);
+      for (int i=0; i<n; i++) ans->SetPointError(i,
+            ans->GetEXlow()[i],ans->GetEXhigh()[i],
+            g0->GetY()[i]-thevalsmin[i],thevalsmax[i]-g0->GetY()[i]);
+   } else { // quadratic sum
+      double *thevals = new double[n];
+      for (int i=0; i<n; i++) thevals[i]=0;
+
+      for (unsigned int i=0; i<gall.size(); i++) 
+         for (int j=0; j<n; j++) {
+            thevals[j] += pow(gall[i]->GetY()[j]-g0->GetY()[j],2);
+         }
+      for (int i=0; i<n; i++) ans->SetPoint(i,ans->GetX()[i],g0->GetY()[i]);
+      for (int i=0; i<n; i++) ans->SetPointError(i,ans->GetEXlow()[i],ans->GetEXhigh()[i],sqrt(thevals[i]),sqrt(thevals[i]));
+   }
+
+   return ans;
+};
+
+TGraphAsymmErrors* ratiograph(TGraphAsymmErrors* g0num, TGraphAsymmErrors* g0den,
+      vector<TGraphAsymmErrors*> gnum, vector<TGraphAsymmErrors*> gden, 
+      bool dominmax=true, Einterpolation type=loglin, bool correl=false) {
+   if (gnum.size() != gden.size()) {
+      cout << "ratiograph: ERROR different vector sizes" << endl;
+      return NULL;
+   }
+   vector<TGraphAsymmErrors*> gall;
+   for (int i=0; i<gnum.size(); i++) {
+      gall.push_back(ratiograph(gnum[i],gden[i],type,correl));
+   }
+
+   TGraphAsymmErrors *g0 = ratiograph(g0num,g0den,type,correl);
+
+   return combo(g0, gall, dominmax);
+};
+
 #endif // ifndef range_h
