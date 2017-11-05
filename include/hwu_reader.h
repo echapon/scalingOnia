@@ -23,6 +23,11 @@ TGraphAsymmErrors* read_hwu(const char* fname, int ihist, int icol) {
    int chist=0;
    TString title;
 
+   if (!file.good()) {
+      cout << "Error, could not read file " << fname << endl;
+      return NULL;
+   }
+
    while (file.good()) {
       getline(file,theline);
       thelineT = TString(theline.c_str());
@@ -38,6 +43,7 @@ TGraphAsymmErrors* read_hwu(const char* fname, int ihist, int icol) {
                cnt++;
             }
          }
+         cout << title << endl;
 
          continue;
       }
@@ -67,11 +73,20 @@ TGraphAsymmErrors* read_hwu(const char* fname, int ihist, int icol) {
 
    const int n = x.size();
 
+   if (y.size() != x.size() || dx.size() != x.size() || dy.size() != x.size()) {
+      cout << "Error in TGraphAsymmErrors* read_hwu(" << fname << ", " << ihist << ", " << icol << "): inconsistent vector sizes." << endl;
+      return NULL;
+   }
+
    // for (int i=0; i<n; i++)
       // cout << x[i] << " " << y[i] << " " << dy[i] << endl;
 
    TGraphAsymmErrors *ans = new TGraphAsymmErrors(n,x.data(),y.data(),dx.data(),dx.data(),dy.data(),dy.data());
-   ans->SetName(Form("gHwU_%i%i",ihist,icol));
+   TString tname(fname);
+   tname.ReplaceAll(" ","_");
+   tname.ReplaceAll(".","_");
+   tname.ReplaceAll("/","_");
+   ans->SetName(Form("gHwU_%s_%i%i",tname.Data(),ihist,icol));
    ans->SetTitle(title);
    return ans;
 

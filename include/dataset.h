@@ -57,6 +57,7 @@ class dataset {
       vector<TGraphAsymmErrors*> get_graphssyst() const {return fsyst_all;};
       TGraphAsymmErrors* get_graphtot() {
          if (!fsyst && fsyst_all.size()>0) get_graphsyst();
+         if (!ftot) return fstat;
          return ftot;
       };
       string             get_name() const {return fname;};
@@ -75,7 +76,7 @@ class dataset {
       void set_graph(TGraphAsymmErrors *gstat, TGraphAsymmErrors *gsyst);
       void set_graph(TH1F *hist);
       void set_graph(const char* file_theory);
-      void set_graphHwU(const char* file_theory, int nsysts=0);
+      void set_graphHwU(const char* file_theory, int nsysts=0, int ihist=1);
       void set_name(string name) {fname = name;};
       void set_expname(string expname) {fexpname = expname;};
       void set_legend(string legend) {flegend = legend;};

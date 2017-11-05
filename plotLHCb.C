@@ -16,7 +16,7 @@ void plotLHCb() {
    // th1.set_legend("COM 8TeV");
    // th1.set_graph("th_inputs/pp2psi8X_8TeV.root");
    th1.set_legend("CSM LO 8TeV");
-   th1.set_graphHwU("th_inputs/ggpsi1g_8000/results.HwU",8);
+   th1.set_graphHwU("th_inputs/ggpsi1g_8000/results.HwU",8,1);
    theory.push_back(th1);
    dataset th2;
    th2.set_sqrts(13000);
@@ -24,7 +24,7 @@ void plotLHCb() {
    // th2.set_legend("COM 13TeV");
    // th2.set_graph("th_inputs/pp2psi8X_13TeV.root");
    th2.set_legend("CSM LO 13TeV");
-   th2.set_graphHwU("th_inputs/ggpsi1g_8000/results.HwU",8);
+   th2.set_graphHwU("th_inputs/ggpsi1g_13000/results.HwU",8,1);
    theory.push_back(th2);
 
    plot(data,theory);

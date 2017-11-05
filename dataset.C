@@ -55,10 +55,10 @@ void dataset::set_graph(const char* file_theory) {
    set_graph(h);
 }
 
-void dataset::set_graphHwU(const char* file_theory, int nsysts) {
-   fstat = read_hwu(file_theory,1,0);
+void dataset::set_graphHwU(const char* file_theory, int nsysts, int ihist) {
+   fstat = read_hwu(file_theory,ihist,0);
    for (int i=0; i<nsysts; i++) {
-      fsyst_all.push_back(read_hwu(file_theory,1,i+4));
+      fsyst_all.push_back(read_hwu(file_theory,ihist,i+4));
       TGraphAsymmErrors *glast = fsyst_all.back();
       for (int j=0; j<glast->GetN(); j++) {
          glast->SetPoint(j,glast->GetX()[j],glast->GetY()[j]);
