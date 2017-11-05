@@ -17,8 +17,8 @@
 using namespace std;
 
 // global settings
-const Escaling       gscaling = pt2;
-const Einterpolation ginterpolation = loglin;
+const Escaling       gscaling = pt2; // pt2 or mtpt
+const Einterpolation ginterpolation = loglin; // lin, cspline, loglin, logcspline
 float                gTextSize = 0.04;
 // should we use the Lafferty & Wyatt prescription to change the x position of the points? (assuming a locally exponentially falling spectrum)
 bool                 doxLW = true;//true;
@@ -130,7 +130,7 @@ void plot(vector<dataset> data, vector<dataset> theory) {
          }
          gtot->SetFillColor(mycolor(i));
          gtot->SetFillStyle(0);
-         gtot->Draw(isth ? "a3" : "P");
+         gtot->Draw(isth ? "3" : "P");
          if (isth) gstat->Draw("P");
 
          if (!gstat) tleg->AddEntry(gstat,di->get_legend().c_str(),isth ? "L" : "LP");
@@ -174,7 +174,7 @@ void plot(vector<dataset> data, vector<dataset> theory) {
             }
             gratiotot->SetFillColor(mycolor(i));
             gratiotot->SetFillStyle(0);
-            gratiotot->Draw(isth ? "a3" : "P");
+            gratiotot->Draw(isth ? "3" : "P");
             if (isth) gratiostat->Draw("P");
          }
 
@@ -257,8 +257,10 @@ TH1F* haxes(TGraphAsymmErrors *graph, dataset data, float textSize, int ndiv, bo
    }
 
    if (log) {
-      ymin=0.5*ymin;
-      ymax=1.5*ymax;
+      // ymin=0.5*ymin;
+      ymin=0.01*ymin;
+      // ymax=1.5*ymax;
+      ymax=100.*ymax;
    } else {
       ymin=0.8*ymin;
       ymax=1.2*ymax;
