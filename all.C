@@ -16,6 +16,9 @@
 // LHCb 7TeV (fwd)
 #include "expdata/ins891233/table_all.h"
 
+// CMS 7TeV (midrap)
+#include "expdata/ins1345023/table_all.h"
+
 // CMS 13TeV (midrap)
 #include "expdata/cmsbph15005/table_all.h"
 
