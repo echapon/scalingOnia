@@ -13,6 +13,7 @@
 
 #include <vector>
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -26,7 +27,7 @@ bool                 plotxt = true;//true;
 
 // declarations
 int   mycolor(int i);
-TH1F* haxes(TGraphAsymmErrors *graph, dataset data, float textSize, int ndiv=503, bool log=false);
+TH1F* haxes(TGraphAsymmErrors *graph, dataset data, float textSize, int ndiv=505, bool log=false, double xmin_=-1, double xmax_=-1);
 void  plot(vector<dataset> data, vector<dataset> theory);
 
 // main function
@@ -87,6 +88,10 @@ void plot(vector<dataset> data, vector<dataset> theory) {
    TLegend *tleg = new TLegend(0.4,0.5,0.9,0.9);
    tleg->SetBorderSize(0);
 
+   ofstream flog("graphs.dat");
+
+   double xmin=0, xmax=0;
+
    // loop on datasets...
    for (unsigned int i=0; i<data.size()+theory.size(); i++) {
       pad1->cd();
@@ -94,6 +99,7 @@ void plot(vector<dataset> data, vector<dataset> theory) {
       bool isth = (idata<0);
       dataset *di = (!isth) ? &(data[idata]) : &(theory[i]);
       TGraphAsymmErrors *gstat = di->get_graphstat();
+      if (isth) setUncert(gstat,0);
       if (gstat) {
          if (doxLW && !isth) gstat = xlw(gstat);
          if (plotxt) gstat = xtgraph(gstat, di->get_sqrts(), gscaling);
@@ -106,15 +112,20 @@ void plot(vector<dataset> data, vector<dataset> theory) {
          if (i==0) {
             // draw axes
             TH1F *axes = haxes(gstat,*di,lTextSize,503,true);
+            xmin = axes->GetXaxis()->GetXmin();
+            xmax = axes->GetXaxis()->GetXmax();
             axes->Draw();
          }
          if (!isth) gstat->Draw("P");
-         else gstat->Draw("P");
+         else gstat->Draw("L");
+
+         printgraph(flog,gstat);
 
          tleg->AddEntry(gstat,di->get_legend().c_str(),isth ? "L" : "LP");
       }
 
       TGraphAsymmErrors *gtot  = di->get_graphtot();
+      if (isth) setUncert(gtot,0);
       if (gtot) {
          if (doxLW && !isth) gtot = xlw(gtot);
          if (plotxt) gtot = xtgraph(gtot, di->get_sqrts(), gscaling);
@@ -126,6 +137,8 @@ void plot(vector<dataset> data, vector<dataset> theory) {
          if (!gstat && i==0) {
             // draw axes
             TH1F *axes = haxes(gtot,*di,lTextSize,503,true);
+            xmin = axes->GetXaxis()->GetXmin();
+            xmax = axes->GetXaxis()->GetXmax();
             axes->Draw();
          }
          gtot->SetFillColor(mycolor(i));
@@ -133,10 +146,12 @@ void plot(vector<dataset> data, vector<dataset> theory) {
          gtot->Draw(isth ? "3" : "P");
          if (isth) gstat->Draw("P");
 
+         printgraph(flog,gtot);
+
          if (!gstat) tleg->AddEntry(gstat,di->get_legend().c_str(),isth ? "L" : "LP");
       }
 
-      if (idata != 0) {
+      if (i>0 && idata != 0) {
          // make ratios
          pad2->cd();
          TGraphAsymmErrors *g0stat = isth ? theory[0].get_graphstat() : data[0].get_graphstat();
@@ -152,11 +167,13 @@ void plot(vector<dataset> data, vector<dataset> theory) {
             gratiostat->SetLineColor(mycolor(i));
             if (i==1) {
                // draw axes
-               TH1F *axes = haxes(gratiostat,*di,lTextSize2,505);
+               TH1F *axes = haxes(gratiostat,*di,lTextSize2,505,false,xmin,xmax);
                axes->GetYaxis()->SetTitle("ratio");
                axes->Draw();
             }
             gratiostat->Draw(isth ? "L" : "P");
+
+            printgraph(flog,gratiostat);
          }
          if (gtot && g0tot) {
             if (doxLW && !isth) g0tot = xlw(g0tot);
@@ -168,14 +185,15 @@ void plot(vector<dataset> data, vector<dataset> theory) {
             gratiotot->SetLineColor(mycolor(i));
             if (i==1 && !gratiostat) {
                // draw axes
-               TH1F *axes = haxes(gratiotot,*di,lTextSize2,505);
+               TH1F *axes = haxes(gratiotot,*di,lTextSize2,505,false,xmin,xmax);
                axes->GetYaxis()->SetTitle("ratio");
                axes->Draw();
             }
             gratiotot->SetFillColor(mycolor(i));
             gratiotot->SetFillStyle(0);
-            gratiotot->Draw(isth ? "3" : "P");
+            gratiotot->Draw(isth ? "L" : "P");
             if (isth) gratiostat->Draw("P");
+            printgraph(flog,gratiotot);
          }
 
          if (plotxt && i!=0) {
@@ -191,11 +209,12 @@ void plot(vector<dataset> data, vector<dataset> theory) {
                gnstat->SetLineColor(mycolor(i));
                if (i==1) {
                   // draw axes
-                  TH1F *axes = haxes(gnstat,*di,lTextSize3,505);
+                  TH1F *axes = haxes(gnstat,*di,lTextSize3,505,false,xmin,xmax);
                   axes->GetYaxis()->SetTitle("n_{eff}");
                   axes->Draw();
                }
                gnstat->Draw(isth ? "L" : "P");
+               printgraph(flog,gnstat);
             }
             if (gtot && g0tot) {
                if (!isth) gntot = ngraph(gtot,g0tot,di->get_sqrts(),data[0].get_sqrts(),ginterpolation);
@@ -206,15 +225,18 @@ void plot(vector<dataset> data, vector<dataset> theory) {
                gntot->SetLineColor(mycolor(i));
                if (i==1 && !gnstat) {
                   // draw axes
-                  TH1F *axes = haxes(gntot,*di,lTextSize3,505);
+                  TH1F *axes = haxes(gntot,*di,lTextSize3,505,false,xmin,xmax);
                   axes->GetYaxis()->SetTitle("n_{eff}");
                   axes->Draw();
                }
                gntot->Draw(isth ? "L" : "P");
+               printgraph(flog,gntot);
             }
          } // if (plotxt)
       } // if (i>1) 
    } // for (unsigned int i=0; i<data.size()+theory.size(); i++) 
+
+   flog.close();
 
    pad1->cd();
    tleg->Draw();
@@ -237,7 +259,7 @@ int mycolor(int i) {
    else return kBlack;
 }
 
-TH1F* haxes(TGraphAsymmErrors *graph, dataset data, float textSize, int ndiv, bool log) {
+TH1F* haxes(TGraphAsymmErrors *graph, dataset data, float textSize, int ndiv, bool log, double xmin_, double xmax_) {
    if (!graph || graph->GetN()==0) return new TH1F("haxes","haxes",1,0,1);
 
    float xmin=0, xmax=-1e99, ymin= log ? 1e99 : 0, ymax=-1e99;
@@ -255,6 +277,8 @@ TH1F* haxes(TGraphAsymmErrors *graph, dataset data, float textSize, int ndiv, bo
          else ymin=1e-10;
       }
    }
+   if (xmin_>0) xmin = xmin_;
+   if (xmax_>0) xmax = xmax_;
 
    if (log) {
       // ymin=0.5*ymin;
@@ -276,6 +300,7 @@ TH1F* haxes(TGraphAsymmErrors *graph, dataset data, float textSize, int ndiv, bo
    ans->GetYaxis()->SetLabelSize(textSize);
    ans->GetYaxis()->SetTitleSize(textSize);
    ans->GetYaxis()->SetNdivisions(ndiv);
+   ans->GetXaxis()->SetNdivisions(505);
    ans->GetYaxis()->SetTitleOffset(1.7*(gTextSize/textSize));
    ans->GetYaxis()->SetRangeUser(ymin,ymax);
 

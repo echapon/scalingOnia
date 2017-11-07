@@ -3,6 +3,9 @@
 
 #include "TGraphAsymmErrors.h"
 #include <math.h>
+#include <fstream>
+
+using namespace std;
 
 class range {
    public:
@@ -24,6 +27,11 @@ typedef enum Einterpolation {
    loglin,
    logcspline
 } Einterpolation;
+
+typedef enum Elwmode {
+   expo,
+   powlaw
+} Elwmode;
 
 const double mjpsi = 3.096916;
 const double mjpsi2 = pow(mjpsi,2);
@@ -180,6 +188,10 @@ TGraphAsymmErrors *ngraph(TGraphAsymmErrors* g1, TGraphAsymmErrors *g2, double s
          ya = -(lng2low->Eval(log(x),0,"S")-lng1low->Eval(log(x),0,"S")) / (log(sqrts2) - log(sqrts1));
          yb = -(lng2high->Eval(log(x),0,"S")-lng1high->Eval(log(x),0,"S")) / (log(sqrts2) - log(sqrts1));
       }
+      // add one unit because we use dsigma/dpt instead of dsigma/ptdpt :)
+      y+=1.;
+      ya+=1.;
+      yb+=1.;
       eyl = y - min(ya,yb);
       eyh = max(ya,yb) - y;
       ans->SetPoint(i,x,y);
@@ -200,10 +212,6 @@ TGraphAsymmErrors *ngraph(TGraphAsymmErrors* g1, TGraphAsymmErrors *g2, double s
 TGraphAsymmErrors *ratiograph(TGraphAsymmErrors* gnum, TGraphAsymmErrors *gden, Einterpolation type=loglin, bool correl=false) {
    // take the ratio of two graphs
 
-   TGraphAsymmErrors *ans = new TGraphAsymmErrors(gnum->GetN());
-   ans->SetName(TString(gnum->GetName()) + "_" + TString(gden->GetName()) + "_ratio");
-   ans->SetTitle(TString("ratio of (") + TString(gnum->GetTitle()) + ") / (" + TString(gden->GetTitle()) + ")");
-
    TGraph *gnumlow = graphlow(gnum);
    TGraph *gnumhigh = graphhigh(gnum);
    TGraph *gdenlow = correl ? graphlow(gden) : graphhigh(gden);
@@ -220,7 +228,35 @@ TGraphAsymmErrors *ratiograph(TGraphAsymmErrors* gnum, TGraphAsymmErrors *gden, 
       lngdenhigh = lngraph(gdenhigh);
    }
 
+   // find overlap in x between the numerator and denominator. We will only compute the ratio where they overlap.
+   int inumfirst=-1, inumlast=-1;
+   int idenfirst=0, idenlast=-1;
+   int iden=0;
    for (int i=0; i<gnum->GetN(); i++) {
+      double xnum = gnum->GetX()[i];
+      for (int iden=idenfirst; iden<gden->GetN()-1; iden++) {
+         double xlden = gden->GetX()[iden];
+         double xhden = gden->GetX()[iden+1];
+         if (xlden<xnum && xhden>xnum) {
+            if (inumfirst<0) {
+               inumfirst = i;
+               idenfirst = iden;
+            } else {
+               inumlast = i;
+               idenlast = iden;
+            }
+            break;
+         }
+      }
+   }
+   // cout << inumfirst << " " << idenfirst << ", " << inumlast << " " << idenlast << endl;
+
+   TGraphAsymmErrors *ans = new TGraphAsymmErrors(inumlast-inumfirst+1);
+   ans->SetName(TString(gnum->GetName()) + "_" + TString(gden->GetName()) + "_ratio");
+   ans->SetTitle(TString("ratio of (") + TString(gnum->GetTitle()) + ") / (" + TString(gden->GetTitle()) + ")");
+
+
+   for (int i=inumfirst; i<=inumlast; i++) {
       double x = gnum->GetX()[i];
       double exl = gnum->GetEXlow()[i];
       double exh = gnum->GetEXhigh()[i];
@@ -246,10 +282,12 @@ TGraphAsymmErrors *ratiograph(TGraphAsymmErrors* gnum, TGraphAsymmErrors *gden, 
          ya = exp(lngnumhigh->Eval(log(x),0,"S"))/exp(lngdenlow->Eval(log(x),0,"S"));
          yb = exp(lngnumlow->Eval(log(x),0,"S"))/exp(lngdenhigh->Eval(log(x),0,"S"));
       }
+      // cout << y << " " << y-ya << " " << y-yb << endl;
       eyl = y - min(ya,yb);
       eyh = max(ya,yb) - y;
-      ans->SetPoint(i,x,y);
-      ans->SetPointError(i,exl,exh,eyl,eyh);
+      int iout = i-inumfirst;
+      ans->SetPoint(iout,x,y);
+      ans->SetPointError(iout,exl,exh,eyl,eyh);
    }
 
    if (lngnum) {delete lngnum; lngnum=0;}
@@ -262,8 +300,8 @@ TGraphAsymmErrors *ratiograph(TGraphAsymmErrors* gnum, TGraphAsymmErrors *gden, 
    return ans;
 };
 
-TGraphAsymmErrors *xlw(TGraphAsymmErrors *g) {
-   // change the x of each bin, according to the Lafferty and Wyatt prescription (http://www.sciencedirect.com/science/article/pii/0168900294011125)
+TGraphAsymmErrors *xlw(TGraphAsymmErrors *g, Elwmode mode=powlaw) {
+   // // change the x of each bin, according to the Lafferty and Wyatt prescription (http://www.sciencedirect.com/science/article/pii/0168900294011125)
 
    TGraphAsymmErrors *ans = new TGraphAsymmErrors(g->GetN());
    ans->SetName(TString(g->GetName()) + "_xlw");
@@ -284,9 +322,20 @@ TGraphAsymmErrors *xlw(TGraphAsymmErrors *g) {
          // here we assume an exponentially falling function in each bin
          // first let's get the slope. 
          double b;
-         if (i>0) b = -log(tmp->GetY()[i]/tmp->GetY()[i-1])/(tmp->GetX()[i]-tmp->GetX()[i-1]);
-         else b = -log(tmp->GetY()[i+1]/tmp->GetY()[i])/(tmp->GetX()[i+1]-tmp->GetX()[i]);
-         double xlw = (b>0 && exl+exh>0) ? (x-exl) + (1./b) * (log(b*(exl+exh)) - log(1-exp(-b*(exl+exh)))) : x;
+         if (i>0) {
+            if (mode==expo) b = -log(tmp->GetY()[i]/tmp->GetY()[i-1])/(tmp->GetX()[i]-tmp->GetX()[i-1]);
+            else b = log(tmp->GetY()[i]/tmp->GetY()[i-1])/log(tmp->GetX()[i]/tmp->GetX()[i-1]);
+         } else {
+            if (mode==expo) b = -log(tmp->GetY()[i+1]/tmp->GetY()[i])/(tmp->GetX()[i+1]-tmp->GetX()[i]);
+            else b = log(tmp->GetY()[i+1]/tmp->GetY()[i])/log(tmp->GetX()[i+1]/tmp->GetX()[i]);
+         }
+         double xlw;
+         if (mode==expo) xlw = (b>0 && exl+exh>0) ? (x-exl) + (1./b) * (log(b*(exl+exh)) - log(1-exp(-b*(exl+exh)))) : x;
+         else {
+            double intgx = (pow(x+exh,b+1)-pow(x-exl,b+1))/((b+1)*(exl+exh));
+            xlw = pow(intgx,1./b);
+            // cout << x-exl << " " << x+exh << " -> " << xlw << " (" << b << ", " << intgx << ")" << endl;
+         }
          double exl_lw = exl - x + xlw;
          double exh_lw = exh + x - xlw;
 
@@ -410,5 +459,37 @@ TGraphAsymmErrors* ratiograph(TGraphAsymmErrors* g0num, TGraphAsymmErrors* g0den
 
    return combo(g0, gall, dominmax);
 };
+
+void printgraph(ofstream &f, TGraphAsymmErrors* g) {
+   if (!g) {
+      cout << "Error, cannot print null graph" << endl;
+      return;
+   }
+   f << "# " << g->GetName() << " ; " << g->GetTitle() << endl;
+   f << "# x_low, x_high, x, y, dy_low, dy_up" << endl;
+
+   double *x = g->GetX();
+   double *y = g->GetY();
+   double *exl = g->GetEXlow();
+   double *exh = g->GetEXhigh();
+   double *eyl = g->GetEYlow();
+   double *eyh = g->GetEYhigh();
+   for (int i=0; i<g->GetN(); i++) {
+      f << x[i]-exl[i] << ", " << x[i]+exh[i] << ", " << x[i] << ", " << y[i] << ", " << eyl[i] << ", " << eyh[i] << endl;
+   }
+   f << endl;
+}
+
+void setUncert(TGraphAsymmErrors *g, double xerr=-1, double yerr=-1) {
+   if (!g) return;
+
+   for (int i=0; i<g->GetN(); i++) {
+      double exl = (xerr>=0) ? xerr : g->GetEXlow()[i];
+      double exh = (xerr>=0) ? xerr : g->GetEXhigh()[i];
+      double eyl = (yerr>=0) ? yerr : g->GetEYlow()[i];
+      double eyh = (yerr>=0) ? yerr : g->GetEYhigh()[i];
+      g->SetPointError(i,exl,exh,eyl,eyh);
+   }
+}
 
 #endif // ifndef range_h

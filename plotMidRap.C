@@ -4,7 +4,7 @@ void plotMidRap() {
    vector<dataset> data;
    dataset data7;
    data7 = dataset_atlas_7tev(0.1);
-   data.push_back(data7); 
+   // data.push_back(data7); 
    dataset data8;
    data8 = dataset_atlas_8tev(0.1);
    data.push_back(data8); 
@@ -18,7 +18,7 @@ void plotMidRap() {
    th7.set_expname("theory");
    th7.set_legend("J/#psi 3S18 7TeV |y|<0.75");
    th7.set_graphHwU("th_inputs/ForEmilien/LHC7/direct_psi1S_3S18.HwU",0,0);
-   theory.push_back(th7);
+   // theory.push_back(th7);
    dataset th8;
    th8.set_sqrts(8000);
    th8.set_expname("theory");

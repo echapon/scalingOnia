@@ -8,7 +8,7 @@
 
 using namespace std;
 
-dataset dummy_dataset(int n, double ptmin, double ptmax, double sqrts, double neff=-4.) {
+dataset dummy_dataset(int n, double ptmin, double ptmax, double sqrts, double neff=-4., int binned=false) {
    dataset ans;
    ans.set_sqrts(sqrts);
    ans.set_expname("dummy");
@@ -21,6 +21,10 @@ dataset dummy_dataset(int n, double ptmin, double ptmax, double sqrts, double ne
    for (int i=0; i<n; i++) {
       double pt = ptmin + i*dpt;
       double y = pow(pt,neff);
+      if (binned) { // emulate data: integrate the xsec in a bin
+         pt += dpt/2.;
+         y = (pow(pt+dpt/2.,neff+1)-pow(pt-dpt/2.,neff+1))/((neff+1)*dpt);
+      }
       g->SetPoint(i,pt,y);
       g->SetPointError(i,dpt/2.,dpt/2.,0,0);
    }
@@ -28,7 +32,7 @@ dataset dummy_dataset(int n, double ptmin, double ptmax, double sqrts, double ne
    ans.set_graph(g,g);
 
    ostringstream oss;
-   oss << "dummy, neff=" << neff <<", " << sqrts << "TeV";
+   oss << "dummy, neff=" << neff <<", " << sqrts/1000. << "TeV";
    ans.set_legend(oss.str());
 
    return ans;
