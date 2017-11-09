@@ -146,10 +146,6 @@ TGraph *graphhigh(TGraphAsymmErrors *g) {
 TGraphAsymmErrors *ngraph(TGraphAsymmErrors* g1, TGraphAsymmErrors *g2, double sqrts1, double sqrts2, Einterpolation type=loglin, bool correl=false) {
    // derive the n exponent for each pt
 
-   TGraphAsymmErrors *ans = new TGraphAsymmErrors(g1->GetN());
-   ans->SetName(TString(g1->GetName()) + "_" + TString(g2->GetName()) + "_n");
-   ans->SetTitle(TString("n exponent of (") + TString(g1->GetTitle()) + ") vs (" + TString(g2->GetTitle()) + ")");
-
    TGraph *g1low = graphlow(g1);
    TGraph *g1high = graphhigh(g1);
    TGraph *g2low = correl ? graphlow(g2) : graphhigh(g2);
@@ -166,37 +162,81 @@ TGraphAsymmErrors *ngraph(TGraphAsymmErrors* g1, TGraphAsymmErrors *g2, double s
       lng2high = lngraph(g2high);
    }
 
+   // find overlap in x between the numerator and denominator. We will only compute the ratio where they overlap.
+   int inumfirst=-1, inumlast=-1;
+   int idenfirst=0, idenlast=-1;
+   int iden=0;
    for (int i=0; i<g1->GetN(); i++) {
+      double xnum = g1->GetX()[i];
+      for (int iden=idenfirst; iden<g2->GetN()-1; iden++) {
+         double xlden = g2->GetX()[iden];
+         double xhden = g2->GetX()[iden+1];
+         if (xlden<xnum && xhden>xnum) {
+            if (inumfirst<0) {
+               inumfirst = i;
+               idenfirst = iden;
+            } else {
+               inumlast = i;
+               idenlast = iden;
+            }
+            break;
+         }
+      }
+   }
+   // cout << inumfirst << " " << idenfirst << ", " << inumlast << " " << idenlast << endl;
+
+   TGraphAsymmErrors *ans = new TGraphAsymmErrors(inumlast-inumfirst+1);
+   ans->SetName(TString(g1->GetName()) + "_" + TString(g2->GetName()) + "_n");
+   ans->SetTitle(TString("n exponent of (") + TString(g1->GetTitle()) + ") vs (" + TString(g2->GetTitle()) + ")");
+
+   double dlogsqrts = log(sqrts2) - log(sqrts1);
+   for (int i=inumfirst; i<=inumlast; i++) {
       double x = g1->GetX()[i];
       double exl = g1->GetEXlow()[i];
       double exh = g1->GetEXhigh()[i];
-      double y=0,eyl=0,eyh=0,ya=0,yb=0;
+      double y=0,eyl=0,eyh=0;
+      double y1l=0, y1h=0, y2l=0, y2h=0 ,y1=0,y2=0;
       if (type==lin) {
-         y = -(log(g2->Eval(x))-log(g1->Eval(x))) / (log(sqrts2) - log(sqrts1));
-         ya = -(log(g2low->Eval(x))-log(g1low->Eval(x))) / (log(sqrts2) - log(sqrts1));
-         yb = -(log(g2high->Eval(x))-log(g1high->Eval(x))) / (log(sqrts2) - log(sqrts1));
+         y1 = log(g1->Eval(x));
+         y2 = log(g2->Eval(x));
+         y1l = y1-log(g1low->Eval(x));
+         y1h = log(g1high->Eval(x))-y1;
+         y2l = y2-log(g2low->Eval(x));
+         y2h = log(g2high->Eval(x))-y2;
       } else if (type==cspline) {
-         y = -(log(g2->Eval(x,0,"S"))-log(g1->Eval(x,0,"S"))) / (log(sqrts2) - log(sqrts1));
-         ya = -(log(g2low->Eval(x,0,"S"))-log(g1low->Eval(x,0,"S"))) / (log(sqrts2) - log(sqrts1));
-         yb = -(log(g2high->Eval(x,0,"S"))-log(g1high->Eval(x,0,"S"))) / (log(sqrts2) - log(sqrts1));
+         y1 = log(g1->Eval(x,0,"S"));
+         y2 = log(g2->Eval(x,0,"S"));
+         y1l = y1-log(g1low->Eval(x,0,"S"));
+         y1h = log(g1high->Eval(x,0,"S"))-y1;
+         y2l = y2-log(g2low->Eval(x,0,"S"));
+         y2h = log(g2high->Eval(x,0,"S"))-y2;
       } else if (type==loglin) {
-         y = -(lng2->Eval(log(x))-lng1->Eval(log(x))) / (log(sqrts2) - log(sqrts1));
-         ya = -(lng2low->Eval(log(x))-lng1low->Eval(log(x))) / (log(sqrts2) - log(sqrts1));
-         yb = -(lng2high->Eval(log(x))-lng1high->Eval(log(x))) / (log(sqrts2) - log(sqrts1));
+         y1 = lng1->Eval(log(x));
+         y2 = lng2->Eval(log(x));
+         y1l = y1-lng1low->Eval(log(x));
+         y1h = lng1high->Eval(log(x))-y1;
+         y2l = y2-lng2low->Eval(log(x));
+         y2h = lng2high->Eval(log(x))-y2;
       } else if (type==logcspline) {
-         y = -(lng2->Eval(log(x),0,"S")-lng1->Eval(log(x),0,"S")) / (log(sqrts2) - log(sqrts1));
-         ya = -(lng2low->Eval(log(x),0,"S")-lng1low->Eval(log(x),0,"S")) / (log(sqrts2) - log(sqrts1));
-         yb = -(lng2high->Eval(log(x),0,"S")-lng1high->Eval(log(x),0,"S")) / (log(sqrts2) - log(sqrts1));
+         y1 = lng1->Eval(log(x),0,"S");
+         y2 = lng2->Eval(log(x),0,"S");
+         y1l = y1-lng1low->Eval(log(x),0,"S");
+         y1l = lng1high->Eval(log(x),0,"S")-y1;
+         y2l = y2-lng2low->Eval(log(x),0,"S");
+         y2h = lng2high->Eval(log(x),0,"S")-y2;
       }
+      y = -(y2-y1)/dlogsqrts;
+      // eyl = y - min(ya,yb);
+      // eyh = max(ya,yb) - y;
+      eyl = -sqrt(pow(y1l,2)+pow(y2l,2))/dlogsqrts;
+      eyh = -sqrt(pow(y1h,2)+pow(y2h,2))/dlogsqrts;
+
       // add one unit because we use dsigma/dpt instead of dsigma/ptdpt :)
       y+=1.;
-      ya+=1.;
-      yb+=1.;
-      eyl = y - min(ya,yb);
-      eyh = max(ya,yb) - y;
-      ans->SetPoint(i,x,y);
+      
+      ans->SetPoint(i-inumfirst,x,y);
       // cout << i << " " << x << " " << y << " " << exl << " " << exh << " " << eyl << " " << eyh << endl;
-      ans->SetPointError(i,exl,exh,eyl,eyh);
+      ans->SetPointError(i-inumfirst,exl,exh,eyl,eyh);
    }
 
    if (lng1) {delete lng1; lng1=0;}
@@ -261,30 +301,60 @@ TGraphAsymmErrors *ratiograph(TGraphAsymmErrors* gnum, TGraphAsymmErrors *gden, 
       double exl = gnum->GetEXlow()[i];
       double exh = gnum->GetEXhigh()[i];
       double y=0,eyl=0,eyh=0,ya=0,yb=0;
+      double ya1=0, ya2=0, yb1=0, yb2=0,yn=0,yd=0;
       if (type==lin || (type==loglin && x<=0)) {
          y = gnum->Eval(x)/gden->Eval(x);
          // if (y<0) cout << x << ", " << y << " = " <<  gnum->Eval(x) << "/" << gden->Eval(x) << endl;
          ya = gnumhigh->Eval(x)/gdenlow->Eval(x);
          yb = gnumlow->Eval(x)/gdenhigh->Eval(x);
+         ya1 = gnumhigh->Eval(x);
+         yb1 = gnumlow->Eval(x);
+         ya2 = gdenlow->Eval(x);
+         yb2 = gdenhigh->Eval(x);
+         yn = gnum->Eval(x);
+         yd = gden->Eval(x);
       } else if (type==cspline || (type==logcspline && x<=0)) {
          y = gnum->Eval(x,0,"S")/gden->Eval(x,0,"S");
          // if (y<0) cout << x << ", " << y << " = " << gnum->Eval(x,0,"S") << "/" << gden->Eval(x,0,"S") << endl;
          ya = gnumhigh->Eval(x,0,"S")/gdenlow->Eval(x,0,"S");
          yb = gnumlow->Eval(x,0,"S")/gdenhigh->Eval(x,0,"S");
+         ya1 = gnumhigh->Eval(x,0,"S");
+         yb1 = gnumlow->Eval(x,0,"S");
+         ya2 = gdenlow->Eval(x,0,"S");
+         yb2 = gdenhigh->Eval(x,0,"S");
+         yn = gnum->Eval(x,0,"S");
+         yd = gden->Eval(x,0,"S");
       } else if (type==loglin) {
-         y = exp(lngnum->Eval(log(x)))/exp(lngden->Eval(log(x),0,"S"));
+         y = exp(lngnum->Eval(log(x)))/exp(lngden->Eval(log(x)));
          // if (y<0) cout << x << ", " << y << " = " << exp(lngnum->Eval(log(x))) << "/" << exp(lngden->Eval(log(x),0,"S")) << endl;
-         ya = exp(lngnumhigh->Eval(log(x)))/exp(lngdenlow->Eval(log(x),0,"S"));
-         yb = exp(lngnumlow->Eval(log(x)))/exp(lngdenhigh->Eval(log(x),0,"S"));
+         ya = exp(lngnumhigh->Eval(log(x)))/exp(lngdenlow->Eval(log(x)));
+         yb = exp(lngnumlow->Eval(log(x)))/exp(lngdenhigh->Eval(log(x)));
+         ya1 = exp(lngnumhigh->Eval(log(x)));
+         yb1 = exp(lngnumlow->Eval(log(x)));
+         ya2 = exp(lngdenlow->Eval(log(x)));
+         yb2 = exp(lngdenhigh->Eval(log(x)));
+         yn = exp(lngnum->Eval(log(x)));
+         yd = exp(lngden->Eval(log(x)));
       } else if (type==logcspline) {
          y = exp(lngnum->Eval(log(x),0,"S"))/exp(lngden->Eval(log(x),0,"S"));
          // if (y<0) cout << x << ", " << y  << " = " << exp(lngnum->Eval(log(x),0,"S")) << "/" << exp(lngden->Eval(log(x),0,"S")) << endl;
          ya = exp(lngnumhigh->Eval(log(x),0,"S"))/exp(lngdenlow->Eval(log(x),0,"S"));
          yb = exp(lngnumlow->Eval(log(x),0,"S"))/exp(lngdenhigh->Eval(log(x),0,"S"));
+         ya1 = exp(lngnumhigh->Eval(log(x),0,"S"));
+         yb1 = exp(lngnumlow->Eval(log(x),0,"S"));
+         ya2 = exp(lngdenlow->Eval(log(x),0,"S"));
+         yb2 = exp(lngdenhigh->Eval(log(x),0,"S"));
+         yn = exp(lngnum->Eval(log(x),0,"S"));
+         yd = exp(lngden->Eval(log(x),0,"S"));
       }
       // cout << y << " " << y-ya << " " << y-yb << endl;
-      eyl = y - min(ya,yb);
-      eyh = max(ya,yb) - y;
+
+      // uncertainties
+      // eyl = y - min(ya,yb);
+      // eyh = max(ya,yb) - y;
+      eyl = y*sqrt(pow(ya1/yn-1,2)+pow(ya2/yd-1,2));
+      eyh = y*sqrt(pow(yb1/yn-1,2)+pow(yb2/yd-1,2));
+
       int iout = i-inumfirst;
       ans->SetPoint(iout,x,y);
       ans->SetPointError(iout,exl,exh,eyl,eyh);

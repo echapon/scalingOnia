@@ -19,10 +19,11 @@ using namespace std;
 
 // global settings
 const Escaling       gscaling = pt2; // pt2 or mtpt
-const Einterpolation ginterpolation = loglin; // lin, cspline, loglin, logcspline
+const Einterpolation ginterpolation = logcspline; // lin, cspline, loglin, logcspline
 float                gTextSize = 0.04;
 // should we use the Lafferty & Wyatt prescription to change the x position of the points? (assuming a locally exponentially falling spectrum)
 bool                 doxLW = true;//true;
+Elwmode              lwmode = powlaw; // expo or powlaw
 bool                 plotxt = true;//true;
 
 // declarations
@@ -101,7 +102,7 @@ void plot(vector<dataset> data, vector<dataset> theory) {
       TGraphAsymmErrors *gstat = di->get_graphstat();
       if (isth) setUncert(gstat,0);
       if (gstat) {
-         if (doxLW && !isth) gstat = xlw(gstat);
+         if (doxLW && !isth) gstat = xlw(gstat,lwmode);
          if (plotxt) gstat = xtgraph(gstat, di->get_sqrts(), gscaling);
 
          // gstat->SetMarkerStyle(20+i);
@@ -116,7 +117,7 @@ void plot(vector<dataset> data, vector<dataset> theory) {
             xmax = axes->GetXaxis()->GetXmax();
             axes->Draw();
          }
-         if (!isth) gstat->Draw("P");
+         if (!isth) gstat->Draw("PL");
          else gstat->Draw("L");
 
          printgraph(flog,gstat);
@@ -127,7 +128,7 @@ void plot(vector<dataset> data, vector<dataset> theory) {
       TGraphAsymmErrors *gtot  = di->get_graphtot();
       if (isth) setUncert(gtot,0);
       if (gtot) {
-         if (doxLW && !isth) gtot = xlw(gtot);
+         if (doxLW && !isth) gtot = xlw(gtot,lwmode);
          if (plotxt) gtot = xtgraph(gtot, di->get_sqrts(), gscaling);
 
          gtot->SetMarkerStyle(20+i);
@@ -158,7 +159,7 @@ void plot(vector<dataset> data, vector<dataset> theory) {
          TGraphAsymmErrors *g0tot = isth ? theory[0].get_graphtot() : data[0].get_graphtot();
          TGraphAsymmErrors *gratiostat=NULL, *gratiotot=NULL;
          if (gstat && g0stat) {
-            if (doxLW && !isth) g0stat = xlw(g0stat);
+            if (doxLW && !isth) g0stat = xlw(g0stat,lwmode);
             if (plotxt) g0stat = xtgraph(g0stat, data[0].get_sqrts(), gscaling);
             gratiostat = ratiograph(gstat,g0stat,ginterpolation);
             gratiostat->SetMarkerStyle(20+i);
@@ -176,7 +177,7 @@ void plot(vector<dataset> data, vector<dataset> theory) {
             printgraph(flog,gratiostat);
          }
          if (gtot && g0tot) {
-            if (doxLW && !isth) g0tot = xlw(g0tot);
+            if (doxLW && !isth) g0tot = xlw(g0tot,lwmode);
             if (plotxt) g0tot = xtgraph(g0tot, data[0].get_sqrts(), gscaling);
             gratiotot = ratiograph(gtot,g0tot,ginterpolation);
             gratiotot->SetMarkerStyle(20+i);
