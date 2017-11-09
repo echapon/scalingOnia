@@ -36,6 +36,8 @@ typedef enum Elwmode {
 const double mjpsi = 3.096916;
 const double mjpsi2 = pow(mjpsi,2);
 
+double mt(double pt) {return sqrt(mjpsi2+pt*pt);}
+
 TGraphAsymmErrors *combgraph(TGraphAsymmErrors *gstat, TGraphAsymmErrors *gsyst) {
    // Combine two graphs with same values but different uncertainties.
    // These uncertainties will be added in quadrature.
@@ -107,13 +109,23 @@ TGraphAsymmErrors *xtgraph(TGraphAsymmErrors* g, double sqrts, Escaling type=pt2
          tmpx = x+exh;
          exh = 2*tmpx/sqrts-newx;
          x = newx;
+
+         // // do not apply the Jacobian
+         // y *= sqrts/2.;
+         // eyl *= sqrts/2.;
+         // eyh *= sqrts/2.;
       } else if (type==mtpt) {
-         double newx = (x+sqrt(mjpsi2+x*x))/sqrts;
-         double tmpx = x-exl;
-         exl = -(tmpx+sqrt(mjpsi2+tmpx*tmpx))/sqrts + newx;
-         tmpx = x+exh;
-         exh = (tmpx+sqrt(mjpsi2+tmpx*tmpx))/sqrts - newx;
+         // // do not apply the Jacobian
+         // y *= sqrts/(1+x/mt(x));
+         // eyl *= sqrts/(1+(x-exl)/mt(x-exl));
+         // eyh *= sqrts/(1+(x+exh)/mt(x+exh));
+
+         double newx = (x+mt(x))/sqrts;
          x = newx;
+         double tmpx = x-exl;
+         exl = -(tmpx+mt(tmpx))/sqrts + newx;
+         tmpx = x+exh;
+         exh = (tmpx+mt(tmpx))/sqrts - newx;
       }
       ans->SetPoint(i,x,y);
       ans->SetPointError(i,exl,exh,eyl,eyh);

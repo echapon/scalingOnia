@@ -53,6 +53,11 @@ void plot(vector<dataset> data, vector<dataset> theory) {
 	c1->cd();
 	TPad *pad2 = new TPad("pad2","pad2",0,(npads==3)*0.3*0.96,1, ysep);
 	TPad *pad3 = new TPad("pad3","pad3",0,0,1,0.3*0.96);
+
+   // grid style
+   gStyle->SetGridStyle(3);
+   gStyle->SetGridWidth(2);
+
    if (npads>=2)
    {
       pad1->SetBottomMargin(0.); // 0.04
@@ -67,10 +72,11 @@ void plot(vector<dataset> data, vector<dataset> theory) {
       } else {
          pad2->SetBottomMargin(0);
          pad3->SetBottomMargin(gStyle->GetPadBottomMargin()/0.3);
+         pad3->SetGridy();
          pad3->Draw();
       }
       pad1->SetTopMargin(gStyle->GetPadTopMargin()/0.7);
-      // pad2->SetGridy();
+      pad2->SetGridy();
       pad2->Draw();
       pad1->Draw();
       pad1->cd();
@@ -115,6 +121,7 @@ void plot(vector<dataset> data, vector<dataset> theory) {
             TH1F *axes = haxes(gstat,*di,lTextSize,503,true);
             xmin = axes->GetXaxis()->GetXmin();
             xmax = axes->GetXaxis()->GetXmax();
+            if (plotxt) axes->GetYaxis()->SetTitle("d#sigma/dp_{T} (x_{T}) [nb/GeV]");
             axes->Draw();
          }
          if (!isth) gstat->Draw("PL");
@@ -140,6 +147,7 @@ void plot(vector<dataset> data, vector<dataset> theory) {
             TH1F *axes = haxes(gtot,*di,lTextSize,503,true);
             xmin = axes->GetXaxis()->GetXmin();
             xmax = axes->GetXaxis()->GetXmax();
+            if (plotxt) axes->GetYaxis()->SetTitle("d#sigma/dp_{T} (x_{T}) [nb/GeV]");
             axes->Draw();
          }
          gtot->SetFillColor(mycolor(i));
