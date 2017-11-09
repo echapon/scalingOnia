@@ -2,12 +2,15 @@
 
 void plotMidRap() {
    vector<dataset> data;
-   dataset data7;
-   data7 = dataset_atlas_7tev(0.1);
+   // dataset data7;
+   // data7 = dataset_atlas_7tev(0.1);
    // data.push_back(data7); 
-   dataset data8;
-   data8 = dataset_atlas_8tev(0.1);
-   data.push_back(data8); 
+   dataset data72;
+   data72 = dataset_cms_7tev(0.1);
+   data.push_back(data72); 
+   // dataset data8;
+   // data8 = dataset_atlas_8tev(0.1);
+   // data.push_back(data8); 
    dataset data13;
    data13 = dataset_cms_13tev(0.1);
    data.push_back(data13); 
@@ -18,13 +21,13 @@ void plotMidRap() {
    th7.set_expname("theory");
    th7.set_legend("J/#psi 3S18 7TeV |y|<0.75");
    th7.set_graphHwU("th_inputs/ForEmilien/LHC7/direct_psi1S_3S18.HwU",0,0);
-   // theory.push_back(th7);
-   dataset th8;
-   th8.set_sqrts(8000);
-   th8.set_expname("theory");
-   th8.set_legend("J/#psi 3S18 8TeV |y|<0.75");
-   th8.set_graphHwU("th_inputs/ForEmilien/LHC8/direct_psi1S_3S18.HwU",0,0);
-   theory.push_back(th8);
+   theory.push_back(th7);
+   // dataset th8;
+   // th8.set_sqrts(8000);
+   // th8.set_expname("theory");
+   // th8.set_legend("J/#psi 3S18 8TeV |y|<0.75");
+   // th8.set_graphHwU("th_inputs/ForEmilien/LHC8/direct_psi1S_3S18.HwU",0,0);
+   // theory.push_back(th8);
    dataset th13;
    th13.set_sqrts(13000);
    th13.set_expname("theory");
