@@ -8,3 +8,5 @@
 - datas.push_back(d7tev); 
 - datas.push_back(d8tev); 
 - plot(datas,vector<dataset>());
+
+See also eg plotMidRap.C, plotTest.C
