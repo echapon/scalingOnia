@@ -34,12 +34,13 @@ namespace ins1345023table1 {
       for (int i=0; i<nbins; i++) {
          x[i] = hy->GetBinCenter(i+1);
          ex[i] = hy->GetBinWidth(i+1)/2.;
-         if (stat) ey[i] = he1->GetBinContent(i+1);
+         // 0.001 factor to convert pb -> nb
+         if (stat) ey[i] = 0.001*he1->GetBinContent(i+1);
          else {
-            if (!correl) ey[i] = he2->GetBinContent(i+1);
-            else ey[i] = sqrt(pow(he2->GetBinContent(i+1),2)+pow(he3->GetBinContent(i+1),2));
+            if (!correl) ey[i] = 0.001*he2->GetBinContent(i+1);
+            else ey[i] = 0.001*sqrt(pow(he2->GetBinContent(i+1),2)+pow(he3->GetBinContent(i+1),2));
          }
-         y[i] = hy->GetBinContent(i+1);
+         y[i] = 0.001*hy->GetBinContent(i+1);
 
       }
 

@@ -27,16 +27,16 @@ dataset dataset_cms_7tev(double rapidity) {
    double absrap = fabs(rapidity);
    if (absrap<0.3) {
       ans.set_raprange(range(0,0.3));
-      ans.set_graph(graph_table1_y1(1,true), graph_table1_y(1,false));
+      ans.set_graph(graph_table1_y1(1,true), graph_table1_y1(1,false));
    } else if (absrap<0.6) {
       ans.set_raprange(range(0.3,0.6));
-      ans.set_graph(graph_table1_y1(2,true), graph_table1_y(2,false));
+      ans.set_graph(graph_table1_y1(2,true), graph_table1_y1(2,false));
    } else if (absrap<0.9) {
       ans.set_raprange(range(0.6,0.9));
-      ans.set_graph(graph_table1_y1(3,true), graph_table1_y(3,false));
+      ans.set_graph(graph_table1_y1(3,true), graph_table1_y1(3,false));
    } else if (absrap<1.2) {
       ans.set_raprange(range(0.9,1.2));
-      ans.set_graph(graph_table1_y1(4,true), graph_table1_y(4,false));
+      ans.set_graph(graph_table1_y1(4,true), graph_table1_y1(4,false));
    } else {
       cout << "ERROR wrong rapidity value " << rapidity << endl;
    }
