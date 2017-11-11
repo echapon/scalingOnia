@@ -3,6 +3,7 @@
 
 #include "include/dataset.h"
 #include "include/utils.h"
+#include "include/parameters.h"
 
 #include "TCanvas.h"
 #include "TPad.h"
@@ -17,15 +18,6 @@
 #include <fstream>
 
 using namespace std;
-
-// global settings
-const Escaling       gscaling = pt2; // pt2 or mtpt
-const Einterpolation ginterpolation = logcspline; // lin, cspline, loglin, logcspline
-float                gTextSize = 0.04;
-// should we use the Lafferty & Wyatt prescription to change the x position of the points? (assuming a locally exponentially falling spectrum)
-bool                 doxLW = true;//true;
-Elwmode              lwmode = powlaw; // expo or powlaw
-bool                 plotxt = true;//true;
 
 // declarations
 int   mycolor(int i);

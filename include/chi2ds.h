@@ -72,7 +72,7 @@ class chi2ds {
       };
 
       // the main chi2 function
-      double thechi2(double *xx) {
+      double chi2(const double *xx) {
          if (!fchecked) sanitycheck();
          if (!fok) return -1;
 
@@ -183,6 +183,24 @@ class chi2ds {
 
          return chi2;
       };
+
+      // number of degrees of freedom
+      int ndf() {
+         if (!fchecked) sanitycheck();
+         if (!fok) return -1;
+
+         int ans=0;
+
+         if (ffitxsec) {
+            for (int i=0; i<fdata.size(); i++) ans+=fdata[i].get_graphtot()->GetN();
+            ans += ftheory.size();
+         } else {
+            for (int i=0; i<fdatan.size(); i++) ans+=fdatan[i]->GetN();
+            ans += ftheory.size()-1;
+         }
+
+         return ans;
+      }
 };
 
 #endif // #ifndef chi2ds_h
