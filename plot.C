@@ -10,6 +10,7 @@
 #include "TLegend.h"
 #include "TH1F.h"
 #include "Rtypes.h"
+#include "TString.h"
 
 #include <vector>
 #include <iostream>
@@ -29,10 +30,10 @@ bool                 plotxt = true;//true;
 // declarations
 int   mycolor(int i);
 TH1F* haxes(TGraphAsymmErrors *graph, dataset data, float textSize, int ndiv=505, bool log=false, double xmin_=-1, double xmax_=-1);
-void  plot(vector<dataset> data, vector<dataset> theory);
+void  plot(vector<dataset> data, vector<dataset> theory, TString cname="graphs");
 
 // main function
-void plot(vector<dataset> data, vector<dataset> theory) {
+void plot(vector<dataset> data, vector<dataset> theory, TString cname) {
    if (data.size()==0) return;
    if (theory.size()!=0 && theory.size()!=data.size()) {
       cout << "Error, inconsistent data and theory vector sizes." << endl;
@@ -95,7 +96,7 @@ void plot(vector<dataset> data, vector<dataset> theory) {
    TLegend *tleg = new TLegend(0.4,0.5,0.9,0.9);
    tleg->SetBorderSize(0);
 
-   ofstream flog("graphs.dat");
+   ofstream flog(TString(cname+".dat").Data());
 
    double xmin=0, xmax=0;
 
@@ -249,6 +250,10 @@ void plot(vector<dataset> data, vector<dataset> theory) {
 
    pad1->cd();
    tleg->Draw();
+
+   c1->SaveAs(cname+".pdf");
+   c1->SaveAs(cname+".png");
+   c1->SaveAs(cname+".C");
 }
 
 // auxiliary functions

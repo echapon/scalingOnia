@@ -9,50 +9,50 @@
 
 using namespace std;
 
-dataset::dataset (const dataset &d, const char* suffix) {
-   fsqrts = d.fsqrts;
-   fraprange = d.fraprange;
-   if (d.fstat) fstat = (TGraphAsymmErrors*) d.fstat->Clone(Form("%s%s",d.fstat->GetName(),suffix));
-   if (d.fsyst) fsyst = (TGraphAsymmErrors*) d.fsyst->Clone(Form("%s%s",d.fsyst->GetName(),suffix));
-   for (int i=0; i<d.fsyst_all.size(); i++)
-      fsyst_all.push_back((TGraphAsymmErrors*) d.fsyst_all[i]->Clone(Form("%s%s",d.fsyst_all[i]->GetName(),suffix)));
-   if (d.ftot) ftot = (TGraphAsymmErrors*) d.ftot->Clone(Form("%s%s",d.ftot->GetName(),suffix));
-   fname = d.fname + "_copy";
-   fexpname = d.fexpname;
-   flegend = d.flegend;
-   flocation = d.flocation;
-   fcomment = d.fcomment;
-   fxheader = d.fxheader;
-   fyheader = d.fyheader;
-   freaction = d.freaction;
-}
+// dataset::dataset (const dataset &d, const char* suffix) {
+//    fsqrts = d.fsqrts;
+//    fraprange = d.fraprange;
+//    if (d.fstat) fstat = (TGraphAsymmErrors*) d.fstat->Clone(Form("%s%s",d.fstat->GetName(),suffix));
+//    if (d.fsyst) fsyst = (TGraphAsymmErrors*) d.fsyst->Clone(Form("%s%s",d.fsyst->GetName(),suffix));
+//    for (int i=0; i<d.fsyst_all.size(); i++)
+//       fsyst_all.push_back((TGraphAsymmErrors*) d.fsyst_all[i]->Clone(Form("%s%s",d.fsyst_all[i]->GetName(),suffix)));
+//    if (d.ftot) ftot = (TGraphAsymmErrors*) d.ftot->Clone(Form("%s%s",d.ftot->GetName(),suffix));
+//    fname = d.fname + "_copy";
+//    fexpname = d.fexpname;
+//    flegend = d.flegend;
+//    flocation = d.flocation;
+//    fcomment = d.fcomment;
+//    fxheader = d.fxheader;
+//    fyheader = d.fyheader;
+//    freaction = d.freaction;
+// }
 
-dataset dataset::operator=(const dataset &d) {
-   if (fstat) delete fstat;
-   if (fsyst) delete fsyst;
-   for (int i=0; i<fsyst_all.size(); i++) delete fsyst_all[i];
-   fsyst_all.clear();
-   if (ftot) delete ftot;
+// dataset dataset::operator=(const dataset &d) {
+//    if (fstat) delete fstat;
+//    if (fsyst) delete fsyst;
+//    for (int i=0; i<fsyst_all.size(); i++) delete fsyst_all[i];
+//    fsyst_all.clear();
+//    if (ftot) delete ftot;
 
-   const char* suffix="_copy";
-   fsqrts = d.fsqrts;
-   fraprange = d.fraprange;
-   if (d.fstat) fstat = (TGraphAsymmErrors*) d.fstat->Clone(Form("%s%s",d.fstat->GetName(),suffix));
-   if (d.fsyst) fsyst = (TGraphAsymmErrors*) d.fsyst->Clone(Form("%s%s",d.fsyst->GetName(),suffix));
-   for (int i=0; i<d.fsyst_all.size(); i++)
-      fsyst_all.push_back((TGraphAsymmErrors*) d.fsyst_all[i]->Clone(Form("%s%s",d.fsyst_all[i]->GetName(),suffix)));
-   if (d.ftot) ftot = (TGraphAsymmErrors*) d.ftot->Clone(Form("%s%s",d.ftot->GetName(),suffix));
-   fname = d.fname + "_copy";
-   fexpname = d.fexpname;
-   flegend = d.flegend;
-   flocation = d.flocation;
-   fcomment = d.fcomment;
-   fxheader = d.fxheader;
-   fyheader = d.fyheader;
-   freaction = d.freaction;
+//    const char* suffix="_copy";
+//    fsqrts = d.fsqrts;
+//    fraprange = d.fraprange;
+//    if (d.fstat) fstat = (TGraphAsymmErrors*) d.fstat->Clone(Form("%s%s",d.fstat->GetName(),suffix));
+//    if (d.fsyst) fsyst = (TGraphAsymmErrors*) d.fsyst->Clone(Form("%s%s",d.fsyst->GetName(),suffix));
+//    for (int i=0; i<d.fsyst_all.size(); i++)
+//       fsyst_all.push_back((TGraphAsymmErrors*) d.fsyst_all[i]->Clone(Form("%s%s",d.fsyst_all[i]->GetName(),suffix)));
+//    if (d.ftot) ftot = (TGraphAsymmErrors*) d.ftot->Clone(Form("%s%s",d.ftot->GetName(),suffix));
+//    fname = d.fname + "_copy";
+//    fexpname = d.fexpname;
+//    flegend = d.flegend;
+//    flocation = d.flocation;
+//    fcomment = d.fcomment;
+//    fxheader = d.fxheader;
+//    fyheader = d.fyheader;
+//    freaction = d.freaction;
 
-   return *this;
-}
+//    return *this;
+// }
 
 void dataset::set_graph(TGraphAsymmErrors *gstat, TGraphAsymmErrors *gsyst) {
    if (gstat) fstat = gstat;
