@@ -30,8 +30,13 @@ class dataset {
       string         freaction;
 
    public:
-      // constructor
+      // default constructor
       dataset() : fstat(0), fsyst(0), fsyst_all(), ftot(0) {};
+
+      // copy constructor
+      dataset (const dataset &d, const char* suffix="_copy");
+      // assignement operator
+      dataset operator=(const dataset &d); 
 
       // destructor
       ~dataset() {
@@ -88,6 +93,10 @@ class dataset {
 
       // other functions
       void interpolate(int n, Einterpolation type=loglin, bool doLW=false);
+
+      // operators
+      dataset operator+(dataset d);
+      dataset operator*(double s);
 };
 
 #endif // ifndef dataset_h

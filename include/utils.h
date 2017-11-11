@@ -574,4 +574,41 @@ void setUncert(TGraphAsymmErrors *g, double xerr=-1, double yerr=-1) {
    }
 }
 
+void add(TGraphAsymmErrors *g0, TGraphAsymmErrors *gtoadd) {
+   if (!g0 || !gtoadd) return;
+   if (g0->GetN() != gtoadd->GetN()) {
+      cout << "Error in add(TGraphAsymmErrors*, TGraphAsymmErrors*): graphs have different size " << g0->GetN() << " " << gtoadd->GetN() << endl;
+      return;
+   }
+
+   for (int i=0; i<g0->GetN(); i++) {
+      double x0 = g0->GetX()[i];
+      double y0 = g0->GetY()[i];
+      double y1 = gtoadd->GetY()[i];
+      double exl0 = g0->GetEXlow()[i];
+      double exh0 = g0->GetEXhigh()[i];
+      double eyl0 = g0->GetEYlow()[i];
+      double eyl1 = gtoadd->GetEYlow()[i];
+      double eyh0 = g0->GetEYhigh()[i];
+      double eyh1 = gtoadd->GetEYhigh()[i];
+      g0->SetPoint(i,x0,y0+y1);
+      g0->SetPointError(i,exl0,exh0,sqrt(pow(eyl0,2)+pow(eyl1,2)),sqrt(pow(eyh0,2)+pow(eyh1,2)));
+   }
+}
+
+void scale(TGraphAsymmErrors *g0, double s) {
+   if (!g0) return;
+
+   for (int i=0; i<g0->GetN(); i++) {
+      double x0 = g0->GetX()[i];
+      double y0 = g0->GetY()[i];
+      double exl0 = g0->GetEXlow()[i];
+      double exh0 = g0->GetEXhigh()[i];
+      double eyl0 = g0->GetEYlow()[i];
+      double eyh0 = g0->GetEYhigh()[i];
+      g0->SetPoint(i,x0,s*y0);
+      g0->SetPointError(i,exl0,exh0,s*eyl0,s*eyh0);
+   }
+}
+
 #endif // ifndef range_h
