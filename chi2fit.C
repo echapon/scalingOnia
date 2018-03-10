@@ -56,6 +56,14 @@ void chi2fit(const char * minName = "Minuit2",
       thechi2.addtheory(theory);
    }
 
+   thechi2.setmode(fitxsec);
+   thechi2.setinterpolation(cspline);
+
+   double test[4] = {0.25,0.25,0.25,0.25};
+   cout << thechi2.chi2(test) << endl;
+   test[0] = 0;
+   cout << thechi2.chi2(test) << endl;
+
    // now do the minimisation
    ROOT::Math::Minimizer* minimum =
       ROOT::Math::Factory::CreateMinimizer(minName, algoName);
@@ -89,21 +97,38 @@ void chi2fit(const char * minName = "Minuit2",
    const double *xs = minimum->X();
    const double *err = minimum->Errors();
    std::cout << "Minimum: chi2/ndf: " << minimum->MinValue() << "/" << thechi2.ndf()  << std::endl;
-   cout << "Best fit parameters: " << endl;
-   for (int i=0; i<ntheories; i++) {
-      if (!fitxsec && i==ntheories-1) break;
-      cout << tags[i] << ": " << xs[i] << "+/-" << err[i] << endl;
-   }
+   // cout << "Best fit parameters: " << endl;
+   // for (int i=0; i<ntheories; i++) {
+   //    if (!fitxsec && i==ntheories-1) break;
+   //    cout << tags[i] << ": " << xs[i] << " +/- " << err[i] << endl;
+   // }
 
-   // expected minimum is 0
-   if ( minimum->MinValue()  < 1.E-4  && f(xs) < 1.E-4)
-      std::cout << "Minimizer " << minName << " - " << algoName
-                << "   converged to the right minimum" << std::endl;
-   else {
-      std::cout << "Minimizer " << minName << " - " << algoName
-                << "   failed to converge !!!" << std::endl;
-      Error("NumericalMinimization","fail to converge");
+   vector<dataset> theory_bs;
+   dataset th7;
+   th7.set_sqrts(7000);
+   th7.set_expname("theory_bs");
+   th7.set_legend("J/#psi best fit 7TeV |y|<0.75");
+   th7.set_graphHwU(Form("th_inputs/ForEmilien/LHC7/direct_psi1S_%s.HwU",tags[0]),0,0);
+   th7 = th7*xs[0];
+   dataset th13;
+   th13.set_sqrts(13000);
+   th13.set_expname("theory_bs");
+   th13.set_legend("J/#psi best fit 13TeV |y|<0.75");
+   th13.set_graphHwU(Form("th_inputs/ForEmilien/LHC13/direct_psi1S_%s.HwU",tags[0]),0,0);
+   th13 = th13*xs[0];
+   for (int i=1; i<ntheories; i++) {
+      dataset thtmp7;
+      thtmp7.set_graphHwU(Form("th_inputs/ForEmilien/LHC7/direct_psi1S_%s.HwU",tags[i]),0,0);
+      thtmp7 = thtmp7*xs[i];
+      th7 = th7 + thtmp7;
+      dataset thtmp13;
+      thtmp13.set_graphHwU(Form("th_inputs/ForEmilien/LHC13/direct_psi1S_%s.HwU",tags[i]),0,0);
+      thtmp13 = thtmp13*xs[i];
+      th13 = th13 + thtmp13;
    }
+   theory_bs.push_back(th7);
+   theory_bs.push_back(th13);
 
-   return 0;
+   // Draw the best fit results
+   plot(data,theory_bs,"bestfit");
 }

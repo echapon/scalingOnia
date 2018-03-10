@@ -35,8 +35,8 @@ class dataset {
 
       // // copy constructor
       // dataset (const dataset &d, const char* suffix="_copy");
-      // // assignement operator
-      // dataset operator=(const dataset &d); 
+      // assignement operator
+      dataset operator=(const dataset &d); 
 
       // destructor
       ~dataset() {

@@ -31,6 +31,7 @@ class chi2ds {
       void setdata(vector<dataset> data) {fdata = data;};
       void addtheory(vector<dataset> theory) {ftheory.push_back(theory);};
       void setmode(bool fitxsec) {ffitxsec = fitxsec;};
+      void setinterpolation(Einterpolation type) {ftype = type;};
 
       // check all OK + create neff graphs if needed
       void sanitycheck() {
@@ -96,29 +97,32 @@ class chi2ds {
                } // k in theory.size()
 
                for (int j=0; j<gd->GetN(); j++) {
-                  double x = gd->GetY()[j];
+                  double x = gd->GetX()[j];
                   double num = gd->GetY()[j];
                   double denl = pow(gd->GetEYlow()[j],2);
                   double denh = pow(gd->GetEYhigh()[j],2);
                   for (int k=0; k<gt.size(); k++) {
                      double y0,yl,yh;
                      if (ftype==lin) {
-                       y0 = xx[k]*gt[k]->Eval(x);
-                       yl = xx[k]*gtl[k]->Eval(x);
-                       yh = xx[k]*gth[k]->Eval(x);
+                       y0 = gt[k]->Eval(x);
+                       yl = gtl[k]->Eval(x);
+                       yh = gth[k]->Eval(x);
+                     } else if (ftype==cspline) {
+                       y0 = gt[k]->Eval(x,0,"S");
+                       yl = gtl[k]->Eval(x,0,"S");
+                       yh = gth[k]->Eval(x,0,"S");
                      } else if (ftype==loglin) {
-                       y0 = xx[k]*gt[k]->Eval(x,0,"S");
-                       yl = xx[k]*gtl[k]->Eval(x,0,"S");
-                       yh = xx[k]*gth[k]->Eval(x,0,"S");
-                     } else if (ftype==loglin) {
-                       y0 = xx[k]*gt[k]->Eval(log(x));
-                       yl = xx[k]*gtl[k]->Eval(log(x));
-                       yh = xx[k]*gth[k]->Eval(log(x));
+                       y0 = gt[k]->Eval(log(x));
+                       yl = gtl[k]->Eval(log(x));
+                       yh = gth[k]->Eval(log(x));
                      } else if (ftype==logcspline) {
-                       y0 = xx[k]*gt[k]->Eval(log(x),0,"S");
-                       yl = xx[k]*gtl[k]->Eval(log(x),0,"S");
-                       yh = xx[k]*gth[k]->Eval(log(x),0,"S");
+                       y0 = gt[k]->Eval(log(x),0,"S");
+                       yl = gtl[k]->Eval(log(x),0,"S");
+                       yh = gth[k]->Eval(log(x),0,"S");
                      }
+                     y0 *= xx[k];
+                     yl *= xx[k];
+                     yh *= xx[k];
                      num += -y0;
                      denl += pow(y0-yl,2);
                      denh += pow(yh-y0,2);
@@ -144,7 +148,7 @@ class chi2ds {
                } // k in theory.size()
 
                for (int j=0; j<gd->GetN(); j++) {
-                  double x = gd->GetY()[j];
+                  double x = gd->GetX()[j];
                   double num = gd->GetY()[j];
                   double denl = pow(gd->GetEYlow()[j],2);
                   double denh = pow(gd->GetEYhigh()[j],2);
@@ -159,7 +163,7 @@ class chi2ds {
                        y0 = a*gt[k]->Eval(x);
                        yl = a*gtl[k]->Eval(x);
                        yh = a*gth[k]->Eval(x);
-                     } else if (ftype==loglin) {
+                     } else if (ftype==cspline) {
                        y0 = a*gt[k]->Eval(x,0,"S");
                        yl = a*gtl[k]->Eval(x,0,"S");
                        yh = a*gth[k]->Eval(x,0,"S");

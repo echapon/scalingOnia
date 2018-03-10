@@ -64,8 +64,8 @@ TGraphAsymmErrors* read_hwu(const char* fname, int ihist, int icol) {
          double val = atof(tok.Data());
          if (ccol==-2) xl = val;
          else if (ccol==-1) xh = val;
-         else if (ccol==icol) y.push_back(val);
-         else if (ccol==icol_dy) dy.push_back(val);
+         else if (ccol==icol) y.push_back(fabs(val));
+         else if (ccol==icol_dy) dy.push_back(fabs(val));
       }
       x.push_back((xl+xh)/2.);
       dx.push_back((xh-xl)/2.);
